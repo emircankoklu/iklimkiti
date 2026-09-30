@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Zihin Haritaları | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Zihin Haritaları</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="grid grid-3">
+            {% for map in mind_maps %}
+            <div class="card">
+                <h3>{{ map.title }}</h3>
+                <p>{{ map.description|truncatechars:120 }}</p>
+                <a href="{% url 'mind_map_detail' map.slug %}">Haritayı aç</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">Zihin haritası bulunmuyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

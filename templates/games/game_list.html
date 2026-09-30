@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Oyunlar | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Mini oyunlar</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="filter-bar">
+            <input type="search" placeholder="Oyun ara..." value="{{ query }}">
+        </div>
+        <div class="grid grid-3">
+            {% for game in games %}
+            <article class="card">
+                <span class="tag">{{ game.game_type }}</span>
+                <h3>{{ game.title }}</h3>
+                <p>{{ game.description|truncatechars:120 }}</p>
+                {% if game.status == 'placeholder' %}
+                    <p>Bu oyun yakında aktif olacak.</p>
+                {% else %}
+                    <a href="{% url 'game_detail' game.slug %}">Oyunu aç →</a>
+                {% endif %}
+            </article>
+            {% empty %}
+            <div class="empty-state">Yayında oyun bulunmuyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

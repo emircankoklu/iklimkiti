@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Kayıt Ol | İklimKiti{% endblock %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="form-card">
+            <h1>Kayıt ol</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Kayıt ol</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}{{ module.title }} | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ module.title }}</h1>
+        <a href="{% url 'topic_detail' topic.slug %}">Konuya dön</a>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <p><strong>Problem:</strong> {{ module.problem_statement }}</p>
+            <p><strong>Gerçek yaşam örneği:</strong> {{ module.real_life_example }}</p>
+            <p><strong>Eylem çağrısı:</strong> {{ module.action_challenge }}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

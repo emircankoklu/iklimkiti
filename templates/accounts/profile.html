@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Profil | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Profil</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <h2>{{ profile.display_name|default:user.username }}</h2>
+            <p>Kayıt tarihi: {{ user.date_joined|date:'d.m.Y' }}</p>
+            <div class="progress-row">
+                <span>İlerlemem</span>
+                <div class="progress-bar" aria-label="İlerleme bilgisi">
+                    <div class="progress-fill" style="width: {{ progress_count|default:0 }}%;"></div>
+                </div>
+                <span>{{ progress_count|default:0 }}%</span>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <h3>Rozetler</h3>
+            <div class="badge-grid">
+                {% for badge in user.badges.all %}
+                    <span class="badge-item">{{ badge.badge.icon }} {{ badge.badge.name }}</span>
+                {% empty %}
+                    <p>Henüz kazanılan rozet yok.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

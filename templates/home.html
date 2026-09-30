@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}İklimKiti | Ana Sayfa{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <span class="tag">{{ homepage.hero_tag }}</span>
+            <h1>{{ homepage.hero_title }}</h1>
+            <p>{{ homepage.hero_description }}</p>
+            <div class="hero-actions">
+                <a class="primary-btn" href="{% url 'digital_missions' %}">Dijital göreve başla</a>
+                <a class="secondary-btn" href="{% url 'game_list' %}">Oyunlara Başla</a>
+                <a class="secondary-btn" href="{% url 'assistant' %}">İklimKiti Asistanına Sor</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <video class="hero-video" controls autoplay muted playsinline preload="metadata" aria-label="İklimKiti tanıtım videosu">
+                <source src="{% static 'videos/iklimkiti-tanitim.mp4' %}" type="video/mp4">
+                Tarayıcınız video oynatmayı desteklemiyor. <a href="{% static 'videos/iklimkiti-tanitim.mp4' %}">Videoyu aç</a>.
+            </video>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div><span class="tag">Tamamen dijital · QR ile açılmaya hazır</span><h2>İklim karar laboratuvarı</h2></div>
+        </div>
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>QR’ı tara, bir senaryoyu çöz</h3>
+                <p>Yemekhane, tartım ya da özel cihaz gerektirmez. Öğrenci; gıda güvenliği, su ve iklim seçimlerini telefonda kısa simülasyonlarla dener.</p>
+                <ol class="mission-steps">
+                    <li>Bir iklim-gıda görevini aç.</li>
+                    <li>Kararını seç, sonucunu ve gerekçesini gör.</li>
+                    <li>Üç görevi tamamla; öğrenme sonucunu kendi cihazında gör.</li>
+                </ol>
+                <p class="privacy-note">Yanıtlar sunucuya gönderilmez. İlerleme yalnızca bu cihazdaki tarayıcıda saklanır.</p>
+                <a class="primary-btn" href="{% url 'digital_missions' %}">Görevleri keşfet →</a>
+            </div>
+            <div class="card">
+                <span class="tag">100 puanlık ön eleme cetveli</span>
+                <h3>Her ölçüt için kanıt üretin</h3>
+                <ul class="rubric-list">
+                    <li><strong>30 puan · Problem ve kanıt:</strong> resmî açık veriler, kaynaklı okul/ev senaryoları ve dijital ön-son öğrenme ölçümü.</li>
+                    <li><strong>25 puan · Yenilik:</strong> QR ile açılan, kararın sonucunu gösteren etkileşimli “İklim Karar Laboratuvarı”.</li>
+                    <li><strong>20 puan · İklim ve toplum:</strong> su-gıda ilişkisi, güvenli seçimler ve senaryo öncesi/sonrası öğrenme farkı.</li>
+                    <li><strong>15 puan · Öğrenci sahiplenmesi:</strong> öğrencilerin yazdığı senaryolar, kendi kararları ve dijital öğrenme pasaportu.</li>
+                    <li><strong>10 puan · İlk pilot:</strong> mevcut site ve telefonlarla hemen denenebilen 30 günlük çevrim içi görev planı.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="tag">Jürinin soracağı sorular</span>
+                <h2>Güçlü cevaplarla düşün</h2>
+            </div>
+            <a href="{% url 'topic_list' %}">Tüm konular</a>
+        </div>
+        <div class="grid grid-2">
+            {% for item in question_answers %}
+            <article class="card qa-item">
+                <span class="eyebrow">{{ item.topic.title }} · {{ item.score_dimension }}</span>
+                <h3>{{ item.question }}</h3>
+                <p>{{ item.answer|truncatechars:260 }}</p>
+                <a href="{% url 'topic_detail' item.topic.slug %}">Konunun tamamını incele →</a>
+            </article>
+            {% empty %}
+            <div class="empty-state">Soru-cevap içerikleri yakında eklenecek.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2>{{ homepage.relationship_title }}</h2>
+        <p><strong>{{ homepage.relationship_lead }}</strong></p>
+        {% if homepage.relationship_body %}<p>{{ homepage.relationship_body }}</p>{% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>Öne çıkan konular</h2>
+            <a href="{% url 'topic_list' %}">Tümünü gör</a>
+        </div>
+        <div class="grid grid-3">
+            {% for topic in topics %}
+            <article class="card topic-card">
+                <span class="tag">{{ topic.theme|default:'Gıda' }}</span>
+                <h3>{{ topic.title }}</h3>
+                <p>{{ topic.description|truncatechars:120 }}</p>
+                <a href="{% url 'topic_detail' topic.slug %}">Detaylarını gör →</a>
+            </article>
+            {% empty %}
+            <div class="empty-state">İçerik henüz eklenmedi.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>Öne çıkan oyunlar</h2>
+            <a href="{% url 'game_list' %}">Hepsini gör</a>
+        </div>
+        <div class="grid grid-3">
+            {% for game in games %}
+            <article class="card">
+                <span class="tag">{{ game.game_type }}</span>
+                <h3>{{ game.title }}</h3>
+                <p>{{ game.description|truncatechars:120 }}</p>
+                <a href="{% url 'game_detail' game.slug %}">Oyna →</a>
+            </article>
+            {% empty %}
+            <div class="empty-state">Yayında oyun bulunmuyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>İklim ve gıda sözlüğü</h2>
+            <a href="{% url 'glossary_list' %}">Tüm terimler</a>
+        </div>
+        <div class="grid grid-3">
+            {% for term in terms %}
+            <article class="card">
+                <h3>{{ term.title }}</h3>
+                <p>{{ term.definition|truncatechars:100 }}</p>
+            </article>
+            {% empty %}
+            <div class="empty-state">Sözlük terimi eklenmedi.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>Günlük yaşam için eylem önerileri</h2>
+        </div>
+        <div class="grid grid-3">
+            {% for action in homepage.actions.all %}
+                {% if action.is_published %}
+                <div class="card"><h3>{{ action.title }}</h3><p>{{ action.description }}</p></div>
+                {% endif %}
+            {% empty %}
+                <div class="empty-state">Eylem önerisi henüz eklenmedi.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>Zihin haritaları</h2>
+        </div>
+        <div class="grid grid-3">
+            {% for map in maps %}
+            <article class="card">
+                <h3>{{ map.title }}</h3>
+                <p>{{ map.description|truncatechars:100 }}</p>
+                <a href="{% url 'mind_map_detail' map.slug %}">Haritayı aç →</a>
+            </article>
+            {% empty %}
+            <div class="empty-state">Zihin haritası bulunmuyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <h2>{{ homepage.assistant_title }}</h2>
+            <p>{{ homepage.assistant_description }}</p>
+            <a class="primary-btn" href="{% url 'assistant' %}">Asistanı aç</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

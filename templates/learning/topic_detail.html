@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}{{ topic.title }} | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ topic.title }}</h1>
+        <p>{{ topic.key_question|default:'Günlük yaşamda ne yapabiliriz?' }}</p>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="card">
+            <p>{{ topic.description }}</p>
+            <p><strong>Öğrenme hedefi:</strong> {{ topic.action_text }}</p>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <h2>Modüller</h2>
+        <div class="grid-list">
+            {% for module in modules %}
+            <div class="list-item">
+                <h3>{{ module.title }}</h3>
+                <p>{{ module.description }}</p>
+                <a href="{% url 'module_detail' module.slug %}">Modüle git</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">Bu konuda modül bulunmuyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <h2>Bilgi kartları</h2>
+        <div class="grid grid-3">
+            {% for card in cards %}
+            <div class="card">
+                <span class="tag">{{ card.card_type }}</span>
+                <h3>{{ card.title }}</h3>
+                <p>{{ card.content }}</p>
+            </div>
+            {% empty %}
+            <div class="empty-state">Bilgi kartı yok.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="tag">100 puanlık proje mantığı</span>
+                <h2>Soruların güçlü cevapları</h2>
+            </div>
+        </div>
+        <div class="grid-list">
+            {% for item in question_answers %}
+            <article class="list-item qa-item">
+                <span class="eyebrow">{{ item.score_dimension }}</span>
+                <h3>{{ item.question }}</h3>
+                <p>{{ item.answer }}</p>
+            </article>
+            {% empty %}
+            <div class="empty-state">Bu konu için soru-cevap hazırlanıyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <h2>İlgili videolar</h2>
+        <div class="grid grid-3">
+            {% for video in videos %}
+            <div class="card">
+                <h3>{{ video.title }}</h3>
+                <a href="{% url 'video_detail' video.slug %}">Videoyu izle</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">Bu konu için video yok.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="tag">Bağlantıları gör</span>
+                <h2>Zihin haritası</h2>
+            </div>
+        </div>
+        <div class="grid grid-3">
+            {% for map in maps %}
+            <article class="card">
+                <h3>{{ map.title }}</h3>
+                <p>{{ map.description }}</p>
+                <p><strong>{{ map.nodes.count }}</strong> bağlantı düğümüyle konuyu problemden eyleme taşı.</p>
+                <a href="{% url 'mind_map_detail' map.slug %}">Haritayı aç →</a>
+            </article>
+            {% empty %}
+            <div class="empty-state">Bu konu için zihin haritası bulunmuyor.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

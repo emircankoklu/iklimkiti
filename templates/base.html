@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#071A2B">
+    <meta name="description" content="İklimKiti - Gıda güvenliği, iklim eğitimi ve sürdürülebilir yaşam platformu.">
+    <title>{% block title %}İklimKiti{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script defer src="{% static 'js/app.js' %}"></script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Ana menü">
+            <a class="brand" href="{% url 'home' %}">İklimKiti</a>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Menüyü aç veya kapat" aria-controls="site-navigation" aria-expanded="false" type="button">☰</button>
+            <div class="nav-links" id="site-navigation">
+                <a href="{% url 'home' %}">Ana Sayfa</a>
+                <a href="{% url 'digital_missions' %}">Dijital Görevler</a>
+                <a href="{% url 'topic_list' %}">Konular</a>
+                <a href="{% url 'video_list' %}">Videolar</a>
+                <a href="{% url 'game_list' %}">Oyunlar</a>
+                <a href="{% url 'mind_map_list' %}">Zihin Haritaları</a>
+                <a href="{% url 'glossary_list' %}">Sözlük</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}">Profil</a>
+                    <a href="{% url 'logout' %}">Çıkış</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Giriş</a>
+                    <a href="{% url 'register' %}">Kayıt</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    {% if messages %}
+        <div class="messages container">
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if user.is_authenticated %}
+        <button class="chatbot-launcher" type="button" aria-label="Asistan aç">💬</button>
+        <aside class="chatbot-panel" id="chatbot-panel" aria-live="polite">
+            <div class="chatbot-header">
+                <strong>İklimKiti Asistanı</strong>
+                <button type="button" class="close-chat" aria-label="Kapat">×</button>
+            </div>
+            <div class="chatbot-body" id="chatbot-body">
+                <div class="message bot">Merhaba! Gıda ve iklim konularında sana yardımcı olabilirim.</div>
+                <div class="message bot">Güvenlik için mesajların hesabınla ilişkilendirilerek yönetici kayıtlarında saklanır. +18 veya hakaret içeren mesajlar engellenir.</div>
+            </div>
+            <form class="chatbot-form" id="chatbot-form">
+                <label class="sr-only" for="chatbot-input">Mesaj</label>
+                <input id="chatbot-input" type="text" maxlength="1000" placeholder="Sorunu sor..." aria-label="Soru girdisi">
+                <button type="submit">Gönder</button>
+            </form>
+        </aside>
+    {% endif %}
+
+    <footer class="site-footer">
+        <div class="container footer-row">
+            <div>
+                <h3>İklimKiti</h3>
+                <p>Gıda güvenliği ve sürdürülebilir yaşam için gençler için eğitici bir platform.</p>
+            </div>
+            <div>
+                <a href="{% url 'about' %}">Hakkımızda</a>
+                <a href="{% url 'references' %}">Kaynakça</a>
+                <a href="{% url 'assistant' %}">Asistan</a>
+            </div>
+        </div>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

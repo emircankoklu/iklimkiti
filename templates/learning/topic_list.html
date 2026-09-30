@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Konular | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Konular</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="filter-bar">
+            <input type="search" placeholder="Konu ara..." value="{{ query }}">
+        </div>
+        <div class="grid grid-3">
+            {% for topic in topics %}
+            <article class="card topic-card">
+                <span class="tag">{{ topic.theme|default:'Öğrenme' }}</span>
+                <h3>{{ topic.title }}</h3>
+                <p>{{ topic.description|truncatechars:140 }}</p>
+                <a href="{% url 'topic_detail' topic.slug %}">Detayları gör →</a>
+            </article>
+            {% empty %}
+            <div class="empty-state">Hiçbir konu bulunamadı.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

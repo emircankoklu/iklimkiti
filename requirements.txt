@@ -1,0 +1,5 @@
+Django>=5.2,<5.3
+google-generativeai>=0.8,<0.9
+openai>=1.0,<3.0
+Pillow>=11,<13
+python-dotenv>=1,<2
