@@ -10,6 +10,11 @@ try:
 except ImportError:  # pragma: no cover
     genai = None
 
+try:
+    from openai import OpenAI
+except ImportError:  # pragma: no cover
+    OpenAI = None
+
 
 class GeminiChatbotService:
     def __init__(self):
@@ -61,3 +66,61 @@ class GeminiChatbotService:
             return re.sub(r'\s+', ' ', text).strip()
         except Exception:
             return self.get_safe_fallback_response()
+
+
+class NvidiaSafetyGuardChatbotService:
+    def __init__(self):
+        self.api_key = getattr(settings, 'NVIDIA_API_KEY', '')
+        self.base_url = getattr(settings, 'NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1')
+        self.model_name = getattr(settings, 'NVIDIA_MODEL', 'nvidia/llama-3.1-nemotron-safety-guard-8b-v3')
+
+    def ask(self, question: str) -> str:
+        try:
+            question = GeminiChatbotService().validate_question(question)
+        except ValueError:
+            raise
+
+        if not self.api_key or OpenAI is None:
+            return GeminiChatbotService().get_safe_fallback_response()
+
+        try:
+            client = OpenAI(
+                base_url=self.base_url,
+                api_key=self.api_key,
+                timeout=25.0,
+                max_retries=1,
+            )
+            completion = client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {
+                        'role': 'system',
+                        'content': (
+                            'Türkçe yanıt ver. Lise öğrencisine uygun, kısa ve anlaşılır bir dil kullan. '
+                            'Gıda güvenliği, iklim, su ve sürdürülebilir yaşam sorularında güvenilir ve '
+                            'temkinli ol; bilmediğin bilgiyi uydurma. Kişisel tıbbi tavsiye verme; riskli '
+                            'gıda durumlarında resmî kaynaklara ve güvenilir bir yetişkine yönlendir. '
+                            'Zararlı, yasa dışı veya tehlikeli isteklere yardımcı olma; kısa ve sakin '
+                            'biçimde reddedip güvenli bir alternatif öner. Kullanıcıdan kişisel bilgi isteme.'
+                        ),
+                    },
+                    {'role': 'user', 'content': question},
+                ],
+                max_tokens=getattr(settings, 'NVIDIA_MAX_OUTPUT_TOKENS', 500),
+                stream=False,
+            )
+            answer = completion.choices[0].message.content
+            if not answer or not answer.strip():
+                return GeminiChatbotService().get_safe_fallback_response()
+            return re.sub(r'\s+', ' ', answer).strip()
+        except Exception:
+            return GeminiChatbotService().get_safe_fallback_response()
+
+
+class ChatbotService:
+    """Use NVIDIA when configured; keep the existing Gemini provider as fallback."""
+
+    def ask(self, question: str) -> str:
+        if getattr(settings, 'NVIDIA_API_KEY', ''):
+            return NvidiaSafetyGuardChatbotService().ask(question)
+        return GeminiChatbotService().ask(question)

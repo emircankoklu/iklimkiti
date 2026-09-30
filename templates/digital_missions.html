@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}İklim Karar Laboratuvarı | İklimKiti{% endblock %}
+
+{% block content %}
+<section class="hero hero-compact">
+    <div class="container">
+        <span class="tag">QR ile erişime hazır · Ücretsiz · Hesap açmadan</span>
+        <h1>İklim Karar Laboratuvarı</h1>
+        <p>Gıda güvenliği ve iklim konularında üç kısa dijital senaryo çöz. Gerçek yemekhane verisi, tartım veya fiziksel etkinlik gerekmez.</p>
+        <p>Bu sayfanın adresine bağlanan bir QR kod okul panosuna asıldığında görevler telefondan doğrudan açılır.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div><span class="tag">Yaklaşık 5 dakika</span><h2>Senaryolarda kararını dene</h2></div>
+            <a href="#gorev-1">İlk göreve geç ↓</a>
+        </div>
+        <div class="mission-grid">
+            <article class="card mission-card" id="kuraklik" data-mission="kuraklik">
+                <span class="eyebrow">Görev 1 · Gıda güvenliği ve su</span>
+                <h3>Kuraklık planı</h3>
+                <p>Kurak bir sezon yaklaşırken bir okul kulübü gıda sisteminin dayanıklılığını artırmak istiyor. İlk adım ne olmalı?</p>
+                <form class="mission-form">
+                    <label><input type="radio" name="kuraklik" value="a"> Yalnızca daha fazla su isteyen tek bir ürüne güvenmek.</label>
+                    <label><input type="radio" name="kuraklik" value="b"> Resmî su/iklim verisini inceleyip, suyu verimli kullanan ve yerel koşula uygun seçenekleri karşılaştırmak.</label>
+                    <label><input type="radio" name="kuraklik" value="c"> Kuraklık riskini dikkate almadan alışkanlıkları sürdürmek.</label>
+                    <button class="secondary-btn" type="submit">Kararımı değerlendir</button>
+                </form>
+                <p class="mission-feedback" aria-live="polite" hidden></p>
+            </article>
+
+            <article class="card mission-card" id="gida-guvenligi" data-mission="gida-guvenligi">
+                <span class="eyebrow">Görev 2 · Gıda güvenliği</span>
+                <h3>Sıcak havada güvenli seçim</h3>
+                <p>Sıcak bir günde soğukta tutulması gereken bir ürünün nasıl saklandığından emin değilsin. Güvenli karar hangisi?</p>
+                <form class="mission-form">
+                    <label><input type="radio" name="gida-guvenligi" value="a"> Etiketteki saklama koşulunu izle; koşul bozulmuşsa tüketmeden önce güvenilir bir yetişkine danış.</label>
+                    <label><input type="radio" name="gida-guvenligi" value="b"> Kokusu normalse saklama koşulunu önemseme.</label>
+                    <label><input type="radio" name="gida-guvenligi" value="c"> Her gıdayı aynı yerde ve aynı sıcaklıkta sakla.</label>
+                    <button class="secondary-btn" type="submit">Kararımı değerlendir</button>
+                </form>
+                <p class="mission-feedback" aria-live="polite" hidden></p>
+            </article>
+
+            <article class="card mission-card" id="israfi-onle" data-mission="israfi-onle">
+                <span class="eyebrow">Görev 3 · Önleme ve kaynak verimliliği</span>
+                <h3>Evde gıda israfını önle</h3>
+                <p>Evde alışveriş öncesi hangi dijital alışkanlık hem ihtiyaç fazlası alımı azaltır hem de güvenli saklamayı destekler?</p>
+                <form class="mission-form">
+                    <label><input type="radio" name="israfi-onle" value="a"> Evde bulunanları kontrol et, öğün planı ve alışveriş listesi hazırla; ürünleri etiketine göre sakla.</label>
+                    <label><input type="radio" name="israfi-onle" value="b"> Evde ne olduğunu kontrol etmeden alışveriş yap.</label>
+                    <label><input type="radio" name="israfi-onle" value="c"> Son kullanma ve saklama bilgilerini dikkate alma.</label>
+                    <button class="secondary-btn" type="submit">Kararımı değerlendir</button>
+                </form>
+                <p class="mission-feedback" aria-live="polite" hidden></p>
+            </article>
+        </div>
+
+        <div class="card mission-summary" id="gorev-ozeti" aria-live="polite">
+            <span class="tag">Kişisel öğrenme özeti</span>
+            <h2>İlerlemeni gör</h2>
+            <p class="mission-score">Henüz görev tamamlamadın. Bir senaryoda kararını değerlendir.</p>
+            <button class="primary-btn" type="button" id="mission-summary-button">Öğrenme özetimi güncelle</button>
+            <p class="privacy-note">Cevapların ve puanın bu cihazın tarayıcısında kalır; ad, okul veya iletişim bilgisi istenmez ve yanıtlar sunucuya gönderilmez.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}<script defer src="{% static 'js/digital_missions.js' %}"></script>{% endblock %}

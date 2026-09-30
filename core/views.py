@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
 
-from core.services.chatbot import GeminiChatbotService
+from core.services.chatbot import ChatbotService
 from core.models import HomePageContent, IdeathonGuide
 from games.models import MiniGame
 from learning.models import GlossaryTerm, MindMap, QuestionAnswer, Topic
@@ -17,6 +17,10 @@ def home(request):
     terms = GlossaryTerm.objects.filter(is_published=True)[:6]
     question_answers = QuestionAnswer.objects.filter(is_published=True).select_related('topic')[:4]
     return render(request, 'home.html', {'topics': topics, 'games': games, 'maps': maps, 'terms': terms, 'question_answers': question_answers, 'homepage': homepage})
+
+
+def digital_missions(request):
+    return render(request, 'digital_missions.html')
 
 
 def about(request):
@@ -53,7 +57,7 @@ def chatbot_api(request):
     if len(message) > 1000:
         return JsonResponse({'error': 'Mesaj çok uzun.'}, status=400)
 
-    service = GeminiChatbotService()
+    service = ChatbotService()
     try:
         response = service.ask(message)
     except ValueError as exc:

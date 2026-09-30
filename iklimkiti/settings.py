@@ -85,3 +85,8 @@ GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
 GEMINI_ENABLED = os.getenv('GEMINI_ENABLED', 'True').lower() == 'true'
 GEMINI_MAX_INPUT_LENGTH = int(os.getenv('GEMINI_MAX_INPUT_LENGTH', '1000'))
 GEMINI_MAX_OUTPUT_TOKENS = int(os.getenv('GEMINI_MAX_OUTPUT_TOKENS', '500'))
+
+NVIDIA_API_KEY = os.getenv('NVIDIA_API_KEY', '')
+NVIDIA_BASE_URL = os.getenv('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1')
+NVIDIA_MODEL = os.getenv('NVIDIA_MODEL', 'nvidia/llama-3.1-nemotron-safety-guard-8b-v3')
+NVIDIA_MAX_OUTPUT_TOKENS = int(os.getenv('NVIDIA_MAX_OUTPUT_TOKENS', '500'))
