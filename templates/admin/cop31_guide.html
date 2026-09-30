@@ -2,14 +2,14 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">Ana sayfa</a> &rsaquo; COP31 Proje Stüdyosu
+    <a href="{% url 'admin:index' %}">Ana sayfa</a> &rsaquo; COP31 jüri hazırlık dosyası
 </div>
 {% endblock %}
 
 {% block content %}
 <div id="content-main">
     <div class="module aligned">
-        <h2>{{ guide.title|default:'COP31 Proje Stüdyosu' }}</h2>
+        <h2>{{ guide.title|default:'COP31 jüri hazırlık dosyası' }}</h2>
         <p>{{ guide.subtitle }}</p>
         <p>{{ guide.introduction }}</p>
         <p><a href="{% url 'admin:core_ideathonguide_change' 1 %}">İçeriği admin panelinde düzenle</a></p>

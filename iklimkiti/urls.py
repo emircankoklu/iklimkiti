@@ -3,14 +3,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from core.views import admin_cop31_studio, custom_404
+from core.views import admin_cop31_guide, custom_404
 
 urlpatterns = [
     path('', include('core.urls')),
     path('konular/', include('learning.urls')),
     path('oyunlar/', include('games.urls')),
     path('profil/', include('accounts.urls')),
-    path('admin/cop31-studio/', admin_cop31_studio, name='admin_cop31_studio'),
+    path('admin/cop31-briefing-7f3c/', admin_cop31_guide, name='admin_cop31_guide'),
     path('admin/', admin.site.urls),
 ]
 

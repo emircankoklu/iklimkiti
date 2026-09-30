@@ -142,18 +142,6 @@ button, input, textarea { font: inherit; }
 .game-status-bar > div { display: grid; gap: .2rem; padding: .85rem 1rem; background: #fff; border: 1px solid var(--color-border); border-radius: 14px; }
 .status-label { color: #5c7180; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
 .game-status-bar strong { color: var(--color-secondary); font-size: 1.35rem; }
-.match-intro { margin: 1rem 0; padding: .9rem 1rem; border-radius: 12px; background: #edf8f2; color: var(--color-secondary); font-weight: 700; }
-.match-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
-.match-card { min-height: 150px; padding: 1rem; border: 2px solid #dfe9e5; border-radius: 16px; background: #fff; color: var(--color-text); text-align: left; cursor: pointer; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
-.match-card:hover, .match-card:focus-visible { transform: translateY(-3px); border-color: var(--color-accent); outline: none; }
-.match-card-definition { background: #fbf8ee; }
-.match-card-label { display: block; margin-bottom: .65rem; color: var(--color-secondary); font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
-.match-card-content { display: block; line-height: 1.5; }
-.match-card-term .match-card-content { font-size: 1.15rem; font-weight: 800; }
-.match-card.selected { border-color: var(--color-warning); box-shadow: 0 0 0 3px rgba(244,201,93,.2); }
-.match-card.matched { border-color: var(--color-success); background: #effaf2; opacity: .72; cursor: default; }
-.match-actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
-.match-result { margin-top: 1.5rem; border-left: 5px solid var(--color-success); }
 
 .game-box { background: #fff; border: 1px solid var(--color-border); border-radius: 22px; padding: 1.5rem; }
 .game-question { margin-bottom: 1rem; }
@@ -177,11 +165,12 @@ button, input, textarea { font: inherit; }
     .nav-links.open { display: flex; flex-direction: column; align-items: flex-start; }
     .hero-grid, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     .game-status-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .match-board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
-    .match-card { min-height: 170px; padding: .8rem; }
     .section-head { display: block; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+.impact-output { margin: 1rem 0; padding: 1rem; border-left: 4px solid var(--color-accent); background: #edf8f2; font-weight: 800; }
+.rubric-list { padding-left: 1.2rem; }
+.rubric-list li { margin: .75rem 0; line-height: 1.55; }

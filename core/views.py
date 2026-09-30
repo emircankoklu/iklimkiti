@@ -12,7 +12,7 @@ from learning.models import GlossaryTerm, MindMap, QuestionAnswer, Topic
 def home(request):
     homepage, _ = HomePageContent.objects.get_or_create(pk=1)
     topics = Topic.objects.filter(is_published=True)[:6]
-    games = MiniGame.objects.filter(is_published=True, status='ready')[:4]
+    games = MiniGame.objects.filter(is_published=True, status='ready').exclude(game_type='matching')[:4]
     maps = MindMap.objects.filter(is_published=True)[:3]
     terms = GlossaryTerm.objects.filter(is_published=True)[:6]
     question_answers = QuestionAnswer.objects.filter(is_published=True).select_related('topic')[:4]
@@ -31,9 +31,9 @@ def references(request):
 
 
 @staff_member_required
-def admin_cop31_studio(request):
+def admin_cop31_guide(request):
     guide = IdeathonGuide.objects.filter(is_published=True).prefetch_related('sections').first()
-    return render(request, 'admin/cop31_studio.html', {'guide': guide})
+    return render(request, 'admin/cop31_guide.html', {'guide': guide})
 
 
 def assistant_view(request):

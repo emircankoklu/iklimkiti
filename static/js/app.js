@@ -61,3 +61,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+(() => {
+    const waste = document.querySelector('#waste-kg');
+    const target = document.querySelector('#reduction-target');
+    const output = document.querySelector('.impact-output');
+    if (!waste || !target || !output) return;
+
+    const update = () => {
+        const kg = Math.max(0, Number(waste.value) || 0);
+        const percent = Math.min(100, Math.max(0, Number(target.value) || 0));
+        const saved = kg * 20 * percent / 100;
+        output.textContent = `30 günde hedef: ${saved.toFixed(1)} kg daha az artan gıda (yaklaşık ${Math.round(saved * 4)} adet 250 g porsiyon).`;
+    };
+    waste.addEventListener('input', update);
+    target.addEventListener('input', update);
+    update();
+})();

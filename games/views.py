@@ -12,7 +12,7 @@ from games.services import complete_game_for_user, get_user_progress
 
 
 def game_list(request):
-    queryset = MiniGame.objects.filter(is_published=True)
+    queryset = MiniGame.objects.filter(is_published=True).exclude(game_type='matching')
     query = request.GET.get('q', '').strip()
     if query:
         queryset = queryset.filter(title__icontains=query)

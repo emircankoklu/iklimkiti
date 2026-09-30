@@ -32,3 +32,13 @@ class GameViewTests(TestCase):
 
         response = self.client.get(reverse('game_list'))
         self.assertEqual(response.status_code, 200)
+
+    def test_matching_game_is_not_listed(self):
+        from django.urls import reverse
+        topic = GameModelTests._make_topic('İklim ve Gıda')
+        MiniGame.objects.create(title='Eşleştir', slug='eslestir', game_type='matching', status='ready', topic=topic)
+        MiniGame.objects.create(title='İklim Bilgisi', slug='iklim-bilgisi', game_type='multiple_choice', status='ready', topic=topic)
+
+        response = self.client.get(reverse('game_list'))
+        self.assertNotContains(response, 'Eşleştir')
+        self.assertContains(response, 'İklim Bilgisi')
