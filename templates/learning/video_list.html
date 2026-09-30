@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Videolar | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Videolar</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="filter-bar">
+            <input type="search" placeholder="Video ara..." value="{{ query }}">
+        </div>
+        <div class="grid grid-3">
+            {% for video in videos %}
+            <div class="card">
+                <h3>{{ video.title }}</h3>
+                <p>{{ video.description|truncatechars:120 }}</p>
+                {% if video.video_url %}<a href="{% url 'video_detail' video.slug %}">İzle</a>{% else %}<span>Video linki eklenmedi.</span>{% endif %}
+            </div>
+            {% empty %}
+            <div class="empty-state">Video bulunamadı.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

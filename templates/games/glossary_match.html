@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eşleştir ve Öğren | İklimKiti{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <span class="tag">Sözlük oyunu</span>
+        <h1>Eşleştir ve öğren</h1>
+        <p>Kavram kartını doğru tanım kartıyla eşleştir. Her doğru cevap bilgini ve serini güçlendirir.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if terms|length >= 2 %}
+        <div class="game-status-bar" aria-live="polite">
+            <div><span class="status-label">Puan</span><strong id="match-score">0</strong></div>
+            <div><span class="status-label">Seri</span><strong id="match-streak">0</strong></div>
+            <div><span class="status-label">Hamle</span><strong id="match-moves">0</strong></div>
+            <div><span class="status-label">Süre</span><strong id="match-timer">00:00</strong></div>
+        </div>
+        <div class="match-intro" id="match-message">Önce bir kavram, ardından ona ait tanımı seç.</div>
+        <div class="match-board" id="match-board" aria-label="Sözlük eşleştirme kartları"></div>
+        <div class="match-actions">
+            <button class="secondary-btn" id="match-restart" type="button">Yeni tur</button>
+            <a class="secondary-btn" href="{% url 'glossary_list' %}">Sözlüğe dön</a>
+        </div>
+        <div class="match-result card" id="match-result" hidden>
+            <span class="tag">Tur tamamlandı</span>
+            <h2>Bilgi zincirin tamamlandı.</h2>
+            <p id="match-result-text"></p>
+            <button class="primary-btn" id="match-play-again" type="button">Tekrar oyna</button>
+        </div>
+        {% else %}
+        <div class="empty-state">Oyunu başlatmak için en az iki sözlük terimi gerekiyor.</div>
+        {% endif %}
+    </div>
+</section>
+
+{{ terms|json_script:'glossary-match-data' }}
+<script defer src="{% static 'js/glossary_match.js' %}"></script>
+{% endblock %}

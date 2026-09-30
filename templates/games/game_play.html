@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.title }} | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ game.title }}</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="game-box">
+            <p>{{ game.instructions }}</p>
+            <form id="game-form" data-game-slug="{{ game.slug }}">
+                {% csrf_token %}
+                {% for question in game.get_questions %}
+                    <div class="game-question">
+                        <h3>{{ forloop.counter }}. {{ question.question }}</h3>
+                        <div class="answer-list">
+                            {% for option in question.options %}
+                            <label class="answer-option">
+                                <input type="radio" name="{{ question.id }}" value="{{ forloop.counter0 }}" required>
+                                <span>{{ option }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>Bu oyunun soruları henüz tanımlanmadı.</p>
+                {% endfor %}
+                <button class="primary-btn" type="submit">Oyunu tamamla</button>
+            </form>
+            <div id="game-result" class="card" style="margin-top:1rem; display:none;"></div>
+        </div>
+    </div>
+</section>
+<script>
+const gameForm = document.getElementById('game-form');
+if (gameForm) {
+  const resultBox = document.getElementById('game-result');
+  gameForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    const payload = {};
+    Array.from(gameForm.elements).forEach((element) => {
+      if (element.type === 'radio' && element.checked) {
+        payload[element.name] = Number(element.value);
+      }
+    });
+    const response = await fetch(`/oyunlar/${gameForm.dataset.gameSlug}/submit/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      },
+      body: new URLSearchParams({ answers: JSON.stringify(payload) })
+    });
+    const data = await response.json();
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `<h3>Sonuç</h3><p>Puan: ${data.score}</p><p>${data.message}</p>`;
+  });
+}
+</script>
+{% endblock %}

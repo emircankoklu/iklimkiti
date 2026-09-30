@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Giriş gerekli | İklimKiti{% endblock %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="form-card">
+            <h1>{{ game.title }}</h1>
+            <p>Oyunu oynamak ve ilerlemeni kaydetmek için giriş yapmalısın.</p>
+            <div class="hero-actions">
+                <a class="primary-btn" href="{% url 'login' %}">Giriş yap</a>
+                <a class="secondary-btn" href="{% url 'register' %}">Kayıt ol</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}İlerleme | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Oyun ilerlemeniz</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="grid-list">
+            {% for item in progress %}
+            <div class="list-item">
+                <h3>{{ item.game.title }}</h3>
+                <p>Durum: {{ item.status }}</p>
+                <p>Skor: {{ item.score }}</p>
+            </div>
+            {% empty %}
+            <div class="empty-state">Henüz oyun ilerlemesi yok.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ guide.title|default:'COP31 Proje Geliştirme Stüdyosu' }} | İklimKiti{% endblock %}
+
+{% block content %}
+<section class="hero hero-compact">
+    <div class="container">
+        <span class="tag">Maarif İklim İdeathonu</span>
+        <h1>{{ guide.title|default:'Gıda ve eğitim için iklim çözümü stüdyosu' }}</h1>
+        <p>{{ guide.subtitle|default:'Kanıttan prototipe, sınıftan sahaya uzanan proje geliştirme rehberi.' }}</p>
+        {% if guide.source_url %}<a class="secondary-btn" href="{{ guide.source_url }}" target="_blank" rel="noopener">Resmî şartnameyi aç</a>{% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container narrow-copy">
+        <p class="lead">{{ guide.introduction|default:'İyi bir fikir yalnızca ilham vermez; problemi kanıtlar, uygulanabilir bir yol çizer ve ölçülebilir bir değişim üretir.' }}</p>
+    </div>
+</section>
+
+{% if guide %}
+<section class="section guide-sections">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="tag">10 hamlelik çalışma planı</span>
+                <h2>Jürinin aradığı cevabı projeye dönüştür</h2>
+            </div>
+            <span class="score-badge">100 puanlık final mantığı</span>
+        </div>
+        <div class="grid grid-2">
+            {% for section in guide.sections.all %}
+                {% if section.is_published %}
+                <article class="card guide-card">
+                    <div class="guide-card-top">
+                        <span class="guide-number">{{ forloop.counter|stringformat:'02d' }}</span>
+                        {% if section.score_weight %}<span class="tag">{{ section.score_weight }} puan</span>{% endif %}
+                    </div>
+                    {% if section.eyebrow %}<p class="eyebrow">{{ section.eyebrow }}</p>{% endif %}
+                    <h3>{{ section.title }}</h3>
+                    <p>{{ section.body|linebreaksbr }}</p>
+                    {% if section.prompt %}<div class="prompt"><strong>Takım sorusu</strong><p>{{ section.prompt|linebreaksbr }}</p></div>{% endif %}
+                </article>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="section"><div class="container"><div class="empty-state">Proje rehberi yakında yayınlanacak.</div></div></section>
+{% endif %}
+
+<section class="section">
+    <div class="container">
+        <div class="card callout-card">
+            <span class="tag">Son kontrol</span>
+            <h2>Projenizi beş cümlede savunabiliyor musunuz?</h2>
+            <p>Bir cümlede kanıtlanan problem, bir cümlede özgün çözüm, bir cümlede pilot planı, bir cümlede ölçülebilir etki ve bir cümlede öğrencilerin kişisel katkısı. Bu beş cümle net değilse sunum dosyasına geçmeden önce rehberdeki ilgili bölüme dönün.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

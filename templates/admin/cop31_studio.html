@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Ana sayfa</a> &rsaquo; COP31 Proje Stüdyosu
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module aligned">
+        <h2>{{ guide.title|default:'COP31 Proje Stüdyosu' }}</h2>
+        <p>{{ guide.subtitle }}</p>
+        <p>{{ guide.introduction }}</p>
+        <p><a href="{% url 'admin:core_ideathonguide_change' 1 %}">İçeriği admin panelinde düzenle</a></p>
+    </div>
+    {% if guide %}
+        {% for section in guide.sections.all %}
+        <div class="module" style="margin-bottom: 16px;">
+            <h2>{{ forloop.counter }}. {{ section.title }}{% if section.score_weight %} ({{ section.score_weight }} puan){% endif %}</h2>
+            <p><strong>{{ section.eyebrow }}</strong></p>
+            <p>{{ section.body|linebreaksbr }}</p>
+            {% if section.prompt %}<p><strong>Takım sorusu:</strong> {{ section.prompt }}</p>{% endif %}
+            <p><a href="{% url 'admin:core_guidesection_change' section.pk %}">Bu bölümü düzenle</a></p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Yayınlanmış COP31 rehberi bulunamadı.</p>
+    {% endif %}
+</div>
+{% endblock %}

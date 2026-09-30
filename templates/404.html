@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}404 | İklimKiti{% endblock %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="form-card">
+            <h1>404</h1>
+            <p>Aradığınız sayfa bulunamadı.</p>
+            <a class="primary-btn" href="{% url 'home' %}">Ana sayfaya dön</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

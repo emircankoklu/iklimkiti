@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module" style="margin-bottom: 20px;">
+        <table>
+            <tr>
+                <th><a href="{% url 'admin_cop31_studio' %}">COP31 Proje Stüdyosu</a></th>
+                <td>Yalnızca yönetici hesabına açık; jüri ölçütleri ve proje hazırlık rehberi.</td>
+                <td><a href="{% url 'admin_cop31_studio' %}" class="button">Stüdyoyu aç</a></td>
+            </tr>
+        </table>
+    </div>
+    {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ mind_map.title }} | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ mind_map.title }}</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="card">
+            {% if mind_map.image %}
+            <img src="{{ mind_map.image.url }}" alt="{{ mind_map.title }}">
+            {% else %}
+            <div class="empty-state">Görsel mevcut değil; harita kısa açıklama ile temsil edilmektedir.</div>
+            {% endif %}
+            <p>{{ mind_map.description }}</p>
+            {% if mind_map.pdf_file %}
+            <a href="{{ mind_map.pdf_file.url }}" target="_blank" rel="noreferrer">PDF indir</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

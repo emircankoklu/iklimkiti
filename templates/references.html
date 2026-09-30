@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Kaynakça | İklimKiti{% endblock %}
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Kaynakça</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="grid-list">
+            {% for source in sources %}
+            <div class="list-item">
+                <h3>{{ source.title }}</h3>
+                <p>{{ source.organization }} · {{ source.source_type }}</p>
+                <p>{{ source.description }}</p>
+                {% if source.url %}<a href="{{ source.url }}" target="_blank" rel="noreferrer">Kaynağı aç</a>{% endif %}
+            </div>
+            {% empty %}
+            <div class="empty-state">Henüz kaynak eklenmedi.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
