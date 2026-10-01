@@ -33,9 +33,83 @@ document.addEventListener('DOMContentLoaded', function () {
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
     if (navToggle && navLinks) {
+        const closeMenu = function (restoreFocus = false) {
+            navLinks.classList.remove('open');
+            navToggle.classList.remove('is-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Menüyü aç');
+            if (restoreFocus) navToggle.focus();
+        };
+
         navToggle.addEventListener('click', function () {
-            const isOpen = navLinks.classList.toggle('open');
+            const isOpen = !navLinks.classList.contains('open');
+            navLinks.classList.toggle('open', isOpen);
+            navToggle.classList.toggle('is-open', isOpen);
             navToggle.setAttribute('aria-expanded', String(isOpen));
+            navToggle.setAttribute('aria-label', isOpen ? 'Menüyü kapat' : 'Menüyü aç');
+        });
+
+        navLinks.querySelectorAll('a').forEach(function (link) {
+            const linkPath = new URL(link.href, window.location.href).pathname.replace(/\/+$/, '') || '/';
+            const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+            if (linkPath === currentPath) link.setAttribute('aria-current', 'page');
+            link.addEventListener('click', function () {
+                closeMenu();
+            });
+
+            if (window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches) {
+                link.addEventListener('pointermove', function (event) {
+                    if (event.pointerType !== 'mouse') return;
+                    const bounds = link.getBoundingClientRect();
+                    const x = (event.clientX - bounds.left) / bounds.width;
+                    const y = (event.clientY - bounds.top) / bounds.height;
+                    link.style.setProperty('--pointer-x', `${x * 100}%`);
+                    link.style.setProperty('--pointer-y', `${y * 100}%`);
+                    link.style.setProperty('--link-shift-x', `${(x - 0.5) * 5}px`);
+                    link.style.setProperty('--link-shift-y', `${(y - 0.5) * 4 - 1}px`);
+                });
+                link.addEventListener('pointerleave', function () {
+                    link.style.removeProperty('--pointer-x');
+                    link.style.removeProperty('--pointer-y');
+                    link.style.removeProperty('--link-shift-x');
+                    link.style.removeProperty('--link-shift-y');
+                });
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (navLinks.classList.contains('open')
+                && !navLinks.contains(event.target)
+                && !navToggle.contains(event.target)) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && navLinks.classList.contains('open')) {
+                closeMenu(true);
+            }
+        });
+
+        window.matchMedia('(min-width: 761px)').addEventListener('change', function (event) {
+            if (event.matches) closeMenu();
+        });
+    }
+
+    const brand = document.querySelector('.brand');
+    if (brand && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        brand.addEventListener('pointermove', function (event) {
+            if (event.pointerType !== 'mouse') return;
+            const bounds = brand.getBoundingClientRect();
+            const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+            const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+            brand.style.setProperty('--brand-tilt-x', `${-y * 12}deg`);
+            brand.style.setProperty('--brand-tilt-y', `${x * 12}deg`);
+        });
+        brand.addEventListener('pointerleave', function () {
+            brand.style.setProperty('--brand-tilt-x', '0deg');
+            brand.style.setProperty('--brand-tilt-y', '0deg');
         });
     }
 
@@ -86,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 status.textContent = data.reply;
             } catch (error) {
-                status.textContent = 'İklimKiti Asistanı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin veya konu sayfalarındaki güvenilir kaynakları inceleyin.';
+                status.textContent = 'İklim Tabağım Asistanı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin veya konu sayfalarındaki güvenilir kaynakları inceleyin.';
             }
 
             body.scrollTop = body.scrollHeight;

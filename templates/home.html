@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}İklimKiti | Ana Sayfa{% endblock %}
+{% block title %}Ana Sayfa | İklim Tabağım{% endblock %}
 
 {% block content %}
 <section class="hero">
@@ -13,11 +13,13 @@
             <div class="hero-actions">
                 <a class="primary-btn" href="{% url 'digital_missions' %}">Dijital göreve başla</a>
                 <a class="secondary-btn" href="{% url 'game_list' %}">Oyunlara Başla</a>
-                <a class="secondary-btn" href="{% url 'assistant' %}">İklimKiti Asistanına Sor</a>
+                {% if user.is_authenticated %}
+                <a class="secondary-btn" href="{% url 'assistant' %}">İklim Tabağım Asistanına Sor</a>
+                {% endif %}
             </div>
         </div>
         <div class="hero-visual">
-            <video class="hero-video" controls autoplay muted playsinline preload="metadata" aria-label="İklimKiti tanıtım videosu">
+            <video class="hero-video" controls autoplay muted playsinline preload="metadata" aria-label="İklim Tabağım tanıtım videosu">
                 <source src="{% static 'videos/iklimkiti-tanitim.mp4' %}" type="video/mp4">
                 Tarayıcınız video oynatmayı desteklemiyor. <a href="{% static 'videos/iklimkiti-tanitim.mp4' %}">Videoyu aç</a>.
             </video>
@@ -186,6 +188,7 @@
     </div>
 </section>
 
+{% if user.is_authenticated %}
 <section class="section">
     <div class="container">
         <div class="card">
@@ -195,4 +198,5 @@
         </div>
     </div>
 </section>
+{% endif %}
 {% endblock %}

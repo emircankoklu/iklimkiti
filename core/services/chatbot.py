@@ -43,7 +43,7 @@ class GeminiChatbotService:
         return question
 
     def get_safe_fallback_response(self):
-        return 'İklimKiti Asistanı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin veya konu sayfalarındaki güvenilir kaynakları inceleyin.'
+        return 'İklim Tabağım Asistanı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin veya konu sayfalarındaki güvenilir kaynakları inceleyin.'
 
     def ask(self, question: str, context: str | None = None) -> str:
         try:
@@ -177,6 +177,17 @@ class ChatbotService:
     """Use OpenRouter/NVIDIA when configured; keep Gemini provider as fallback."""
 
     REFUSAL_RESPONSE = 'Bu tür ifadeler veya +18 içerikler konusunda yardımcı olamam. Lütfen saygılı ve güvenli bir dille, iklim ya da gıda konularında soru sor.'
+    SCOPE_RESPONSE = 'Ben yalnızca iklim, gıda, su, tarım ve sürdürülebilir yaşam konularında yardımcı olabilirim. Bu konulardan biriyle ilgili bir soru sorabilirsin.'
+    TOPIC_PREFIXES = {
+        'iklim', 'climat', 'hava', 'atmosfer', 'sera', 'karbon', 'emisyon',
+        'enerji', 'surdurulebilir', 'cevre', 'ekoloj', 'ekosistem', 'biyocesit',
+        'kurak', 'yagis', 'sicaklik', 'gida', 'besin', 'beslen', 'yemek',
+        'yiyecek', 'icecek', 'tarim', 'ciftci', 'toprak', 'hasat', 'sulama',
+        'pestisit', 'gubre', 'tohum', 'hayvancilik', 'deniz', 'okyanus',
+        'plastik', 'atik', 'israf', 'kompost', 'ambalaj', 'lojistik',
+        'sogukzincir', 'tedarik', 'tuketim', 'uretim', 'organik', 'sera',
+        'biyo', 'su', 'suy', 'mavi', 'gri',
+    }
     BLOCKED_TERMS = {
         'adult', 'anal', 'asshole', 'bastard', 'bitch', 'blowjob', 'boob', 'breast',
         'cock', 'dick', 'fuck', 'hentai', 'nsfw', 'porno', 'porn', 'sex', 'sexual',
@@ -206,10 +217,23 @@ class ChatbotService:
             for word in words
         )
 
+    @classmethod
+    def is_on_topic(cls, text: str) -> bool:
+        normalized = unicodedata.normalize('NFKD', text).casefold()
+        normalized = ''.join(char for char in normalized if not unicodedata.combining(char))
+        words = re.findall(r'[a-z0-9]+', normalized)
+        return any(
+            word == prefix or (len(prefix) >= 4 and word.startswith(prefix))
+            for word in words
+            for prefix in cls.TOPIC_PREFIXES
+        )
+
     def ask(self, question: str) -> str:
         question = GeminiChatbotService().validate_question(question)
         if not self.is_appropriate(question):
             return self.REFUSAL_RESPONSE
+        if not self.is_on_topic(question):
+            return self.SCOPE_RESPONSE
 
         if getattr(settings, 'OPENROUTER_API_KEY', ''):
             response = OpenRouterChatbotService().ask(question)
