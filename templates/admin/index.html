@@ -11,6 +11,25 @@
             </tr>
         </table>
     </div>
+    {% if request.user.is_superuser %}
+    <div class="module" style="margin-bottom: 20px;">
+        <table>
+            <tr>
+                <th><a href="{% url 'admin:core_chatpromptlog_changelist' %}">Asistan prompt kayıtları</a></th>
+                <td>Asistan kullanıcı mesajlarını görüntüleyin veya tüm kayıtları temizleyin.</td>
+                <td>
+                    <a href="{% url 'admin:core_chatpromptlog_changelist' %}" class="button">Logları görüntüle</a>
+                    <form action="{% url 'admin:core_chatpromptlog_clear_all' %}" method="post"
+                          style="display:inline"
+                          onsubmit="return confirm('Tüm asistan prompt logları kalıcı olarak silinsin mi?');">
+                        {% csrf_token %}
+                        <button type="submit" class="button">Tüm logları temizle</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% endif %}
     {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
 </div>
 {% endblock %}

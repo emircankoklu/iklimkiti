@@ -1,4 +1,26 @@
 from django.db import models
+from django.conf import settings
+
+
+class ChatPromptLog(models.Model):
+	STATUS_CHOICES = [
+		('received', 'Alındı'),
+		('blocked', 'Engellendi'),
+		('answered', 'Yanıtlandı'),
+	]
+
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='chat_prompt_logs')
+	prompt = models.TextField()
+	status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='received')
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		ordering = ['-created_at']
+		verbose_name = 'Asistan prompt kaydı'
+		verbose_name_plural = 'Asistan prompt kayıtları'
+
+	def __str__(self):
+		return f'{self.user} - {self.created_at:%Y-%m-%d %H:%M}'
 
 
 class HomePageContent(models.Model):

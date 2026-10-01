@@ -19,11 +19,15 @@ body {
     background: linear-gradient(180deg, #eefaf4 0%, #f5fbf9 100%);
     color: var(--color-text);
     -webkit-text-size-adjust: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 img { max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button, input, textarea { font: inherit; }
+main { flex: 1 0 auto; }
 
 .container { width: min(1100px, calc(100% - 2rem)); margin: 0 auto; }
 .container > * { min-width: 0; }
@@ -204,6 +208,7 @@ button, a, input, label { touch-action: manipulation; }
 .mission-feedback.is-correct { border-color: var(--color-success); }
 .mission-feedback.is-review { border-color: var(--color-warning); }
 .mission-feedback.is-prompt { border-color: var(--color-accent); }
+.mission-card.mission-complete { border-color: var(--color-success); box-shadow: 0 12px 28px rgba(55,214,122,0.2); }
 .mission-summary { margin-top: 1.5rem; }
 .mission-summary h2 { margin-bottom: .5rem; }
 .mission-score { font-size: 1.1rem; font-weight: 700; }
@@ -213,3 +218,45 @@ button, a, input, label { touch-action: manipulation; }
 .rubric-list li { margin: .75rem 0; line-height: 1.55; }
 
 @media (max-width: 900px) { .mission-grid { grid-template-columns: 1fr; } }
+
+.success-banner {
+    position: fixed;
+    top: 5.5rem;
+    left: 50%;
+    z-index: 40;
+    padding: .8rem 1.2rem;
+    border-radius: 999px;
+    background: var(--color-secondary);
+    color: #fff;
+    box-shadow: 0 12px 28px rgba(15,81,50,.25);
+    font-weight: 700;
+    transform: translateX(-50%);
+    animation: success-banner-in 2.6s ease both;
+}
+.confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    pointer-events: none;
+    overflow: hidden;
+}
+.confetti-piece {
+    position: absolute;
+    top: -1rem;
+    left: 50%;
+    width: .65rem;
+    height: 1rem;
+    background: var(--confetti-color);
+    border-radius: 2px;
+    animation: confetti-fall 1.8s cubic-bezier(.2,.7,.3,1) var(--confetti-delay) both;
+}
+.game-success { border-color: var(--color-success); box-shadow: 0 12px 28px rgba(55,214,122,.2); }
+
+@keyframes confetti-fall {
+    0% { opacity: 1; transform: translate3d(0, -5vh, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate3d(var(--confetti-x), 105vh, 0) rotate(var(--confetti-rotation)); }
+}
+@keyframes success-banner-in {
+    0%, 100% { opacity: 0; transform: translate(-50%, -1rem); }
+    12%, 82% { opacity: 1; transform: translate(-50%, 0); }
+}

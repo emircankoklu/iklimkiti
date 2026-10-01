@@ -1,3 +1,34 @@
+window.celebrateSuccess = function (message = 'Harika iş!') {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const banner = document.createElement('div');
+    banner.className = 'success-banner';
+    banner.setAttribute('role', 'status');
+    banner.textContent = message;
+    document.body.appendChild(banner);
+
+    if (!reducedMotion) {
+        const colors = ['#19C3B1', '#37D67A', '#F4C95D', '#3A86FF', '#FF6B6B'];
+        const fragment = document.createDocumentFragment();
+        for (let index = 0; index < 36; index += 1) {
+            const piece = document.createElement('span');
+            piece.className = 'confetti-piece';
+            piece.style.setProperty('--confetti-color', colors[index % colors.length]);
+            piece.style.setProperty('--confetti-x', `${(Math.random() - 0.5) * 100}vw`);
+            piece.style.setProperty('--confetti-delay', `${Math.random() * 180}ms`);
+            piece.style.setProperty('--confetti-rotation', `${Math.random() * 360}deg`);
+            fragment.appendChild(piece);
+        }
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.setAttribute('aria-hidden', 'true');
+        confetti.appendChild(fragment);
+        document.body.appendChild(confetti);
+        window.setTimeout(() => confetti.remove(), 1800);
+    }
+
+    window.setTimeout(() => banner.remove(), 2600);
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');

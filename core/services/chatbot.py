@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Any
 
 from django.conf import settings
@@ -25,6 +26,7 @@ class GeminiChatbotService:
     def build_system_instruction(self):
         return (
             'Türkçe yanıt ver. Lise öğrencisine uygun, kısa ve anlaşılır dili kullan. '
+            '+18, cinsel içerik, hakaret veya küfür üretme; bu tür talepleri kısa ve nazikçe reddet. '
             'Önce güvenilir platform içeriklerine yönlendir. Bilmediğin bilgiyi uydurma. '
             'Kişiye özel tıbbi, hukuki veya finansal tavsiye verme. Gıda güvenliği risklerinde '
             'resmî kurumlara ve uzmanlara başvurulmasını öner. Kişisel veri isteme. '
@@ -68,11 +70,12 @@ class GeminiChatbotService:
             return self.get_safe_fallback_response()
 
 
-class NvidiaSafetyGuardChatbotService:
+class OpenRouterChatbotService:
     def __init__(self):
-        self.api_key = getattr(settings, 'NVIDIA_API_KEY', '')
-        self.base_url = getattr(settings, 'NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1')
-        self.model_name = getattr(settings, 'NVIDIA_MODEL', 'nvidia/llama-3.1-nemotron-safety-guard-8b-v3')
+        self.api_key = getattr(settings, 'OPENROUTER_API_KEY', '')
+        self.base_url = getattr(settings, 'OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
+        self.model_name = getattr(settings, 'OPENROUTER_MODEL', 'stealth/space-bunny-alpha')
+        self.max_output_tokens = getattr(settings, 'OPENROUTER_MAX_OUTPUT_TOKENS', 500)
 
     def ask(self, question: str) -> str:
         try:
@@ -97,6 +100,8 @@ class NvidiaSafetyGuardChatbotService:
                         'role': 'system',
                         'content': (
                             'Türkçe yanıt ver. Lise öğrencisine uygun, kısa ve anlaşılır bir dil kullan. '
+                            'Yalnızca kullanıcıya yönelik nihai yanıtı ver; düşünme sürecini veya iç muhakemeni yazma. '
+                            '+18, cinsel içerik, hakaret veya küfür üretme; bu tür talepleri kısa ve nazikçe reddet. '
                             'Gıda güvenliği, iklim, su ve sürdürülebilir yaşam sorularında güvenilir ve '
                             'temkinli ol; bilmediğin bilgiyi uydurma. Kişisel tıbbi tavsiye verme; riskli '
                             'gıda durumlarında resmî kaynaklara ve güvenilir bir yetişkine yönlendir. '
@@ -106,21 +111,112 @@ class NvidiaSafetyGuardChatbotService:
                     },
                     {'role': 'user', 'content': question},
                 ],
-                max_tokens=getattr(settings, 'NVIDIA_MAX_OUTPUT_TOKENS', 500),
+                max_tokens=self.max_output_tokens,
                 stream=False,
             )
             answer = completion.choices[0].message.content
             if not answer or not answer.strip():
                 return GeminiChatbotService().get_safe_fallback_response()
+            answer = self.remove_reasoning_text(answer)
+            if not answer:
+                return GeminiChatbotService().get_safe_fallback_response()
             return re.sub(r'\s+', ' ', answer).strip()
         except Exception:
             return GeminiChatbotService().get_safe_fallback_response()
 
+    @staticmethod
+    def remove_reasoning_text(answer: str) -> str:
+        """Hide model reasoning when a reasoning-capable model includes it in content."""
+        answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.IGNORECASE | re.DOTALL)
+        answer = re.sub(r'<thinking>.*?</thinking>', '', answer, flags=re.IGNORECASE | re.DOTALL)
+
+        markers = (
+            r"Here's the final answer:",
+            r'Here is the final answer:',
+            r'Final answer:',
+            r'Yanıt:',
+            r'Cevap:',
+        )
+        lower_answer = answer.lower()
+        marker_positions = [
+            (lower_answer.find(marker.lower()), len(marker))
+            for marker in markers
+            if lower_answer.find(marker.lower()) >= 0
+        ]
+        if marker_positions:
+            position, marker_length = min(marker_positions)
+            answer = answer[position + marker_length:]
+        else:
+            thinking_markers = (
+                "Here's a thinking process:",
+                'Here is a thinking process:',
+                'Thinking process:',
+                'Düşünme süreci:',
+            )
+            lower_answer = answer.lower()
+            positions = [
+                lower_answer.find(marker.lower())
+                for marker in thinking_markers
+                if lower_answer.find(marker.lower()) >= 0
+            ]
+            if positions:
+                answer = answer[:min(positions)]
+
+        return answer.strip()
+
+
+class NvidiaSafetyGuardChatbotService(OpenRouterChatbotService):
+    def __init__(self):
+        self.api_key = getattr(settings, 'NVIDIA_API_KEY', '')
+        self.base_url = getattr(settings, 'NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1')
+        self.model_name = getattr(settings, 'NVIDIA_MODEL', 'nvidia/llama-3.1-nemotron-safety-guard-8b-v3')
+        self.max_output_tokens = getattr(settings, 'NVIDIA_MAX_OUTPUT_TOKENS', 500)
+
 
 class ChatbotService:
-    """Use NVIDIA when configured; keep the existing Gemini provider as fallback."""
+    """Use OpenRouter/NVIDIA when configured; keep Gemini provider as fallback."""
+
+    REFUSAL_RESPONSE = 'Bu tür ifadeler veya +18 içerikler konusunda yardımcı olamam. Lütfen saygılı ve güvenli bir dille, iklim ya da gıda konularında soru sor.'
+    BLOCKED_TERMS = {
+        'adult', 'anal', 'asshole', 'bastard', 'bitch', 'blowjob', 'boob', 'breast',
+        'cock', 'dick', 'fuck', 'hentai', 'nsfw', 'porno', 'porn', 'sex', 'sexual',
+        'sexting', 'shit', 'slut', 'tits', 'siktir', 'sikik', 'sikim', 'siker',
+        'sikeyim', 'sikiyor', 'sikmek', 'sik', 'orospu', 'pic', 'piç', 'yarrak',
+        'amcik', 'amcık', 'amk', 'aq', 'oç', 'oc', 'salak', 'aptal', 'gerizekali',
+        'gerizekalı', 'mal', 'embesil', 'pezevenk', 'ibne', 'kahpe',
+        'çıplak', 'ciplak', 'nude', 'onlyfans', 'masturbasyon', 'mastürbasyon',
+        'vajina', 'penis', 'orgazm', 'erotik',
+    }
+
+    @classmethod
+    def is_appropriate(cls, text: str) -> bool:
+        if re.search(r'\b18\s*(?:\+|plus)', text.casefold()):
+            return False
+        normalized = unicodedata.normalize('NFKD', text).casefold()
+        normalized = ''.join(char for char in normalized if not unicodedata.combining(char))
+        normalized = normalized.translate(str.maketrans({'0': 'o', '3': 'e', '4': 'a', '@': 'a', '$': 's'}))
+        words = re.findall(r'[a-z0-9]+', normalized)
+        if 'yetiskin icerik' in normalized:
+            return False
+        return not any(
+            word in cls.BLOCKED_TERMS or any(
+                len(term) >= 5 and word.startswith(term)
+                for term in cls.BLOCKED_TERMS
+            )
+            for word in words
+        )
 
     def ask(self, question: str) -> str:
-        if getattr(settings, 'NVIDIA_API_KEY', ''):
-            return NvidiaSafetyGuardChatbotService().ask(question)
-        return GeminiChatbotService().ask(question)
+        question = GeminiChatbotService().validate_question(question)
+        if not self.is_appropriate(question):
+            return self.REFUSAL_RESPONSE
+
+        if getattr(settings, 'OPENROUTER_API_KEY', ''):
+            response = OpenRouterChatbotService().ask(question)
+        elif getattr(settings, 'NVIDIA_API_KEY', ''):
+            response = NvidiaSafetyGuardChatbotService().ask(question)
+        else:
+            response = GeminiChatbotService().ask(question)
+        if not self.is_appropriate(response):
+            return self.REFUSAL_RESPONSE
+        return response

@@ -1,6 +1,50 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import redirect
+from django.urls import path, reverse
 
-from core.models import GuideSection, HomeAction, HomePageContent, IdeathonGuide
+from core.models import ChatPromptLog, GuideSection, HomeAction, HomePageContent, IdeathonGuide
+
+
+@admin.register(ChatPromptLog)
+class ChatPromptLogAdmin(admin.ModelAdmin):
+	list_display = ('created_at', 'user', 'status')
+	list_filter = ('status', 'created_at')
+	search_fields = ('prompt', 'user__username')
+	readonly_fields = ('user', 'prompt', 'status', 'created_at')
+	date_hierarchy = 'created_at'
+
+	def has_add_permission(self, request):
+		return False
+
+	def has_change_permission(self, request, obj=None):
+		return False
+
+	def has_delete_permission(self, request, obj=None):
+		return False
+
+	def changelist_view(self, request, extra_context=None):
+		extra_context = {**(extra_context or {}), 'can_clear_logs': request.user.is_superuser}
+		return super().changelist_view(request, extra_context=extra_context)
+
+	def get_urls(self):
+		return [
+			path(
+				'clear-all/',
+				self.admin_site.admin_view(self.clear_all_view),
+				name='core_chatpromptlog_clear_all',
+			),
+		] + super().get_urls()
+
+	def clear_all_view(self, request):
+		if not request.user.is_superuser:
+			raise PermissionDenied
+		if request.method != 'POST':
+			return HttpResponseNotAllowed(['POST'])
+		deleted_count, _ = ChatPromptLog.objects.all().delete()
+		self.message_user(request, f'{deleted_count} asistan log kaydı temizlendi.', messages.SUCCESS)
+		return redirect(reverse('admin:core_chatpromptlog_changelist'))
 
 
 class HomeActionInline(admin.TabularInline):

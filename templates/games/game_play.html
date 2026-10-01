@@ -55,7 +55,11 @@ if (gameForm) {
     });
     const data = await response.json();
     resultBox.style.display = 'block';
+    resultBox.classList.toggle('game-success', data.passed);
     resultBox.innerHTML = `<h3>Sonuç</h3><p>Puan: ${data.score}</p><p>${data.message}</p>`;
+    if (data.passed && typeof window.celebrateSuccess === 'function') {
+      window.celebrateSuccess('Tebrikler! Oyunu başarıyla tamamladın 🎉');
+    }
   });
 }
 </script>

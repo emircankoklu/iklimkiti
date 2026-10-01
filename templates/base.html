@@ -46,21 +46,24 @@
         {% block content %}{% endblock %}
     </main>
 
-    <button class="chatbot-launcher" type="button" aria-label="Asistan aç">💬</button>
-    <aside class="chatbot-panel" id="chatbot-panel" aria-live="polite">
-        <div class="chatbot-header">
-            <strong>İklimKiti Asistanı</strong>
-            <button type="button" class="close-chat" aria-label="Kapat">×</button>
-        </div>
-        <div class="chatbot-body" id="chatbot-body">
-            <div class="message bot">Merhaba! Gıda ve iklim konularında sana yardımcı olabilirim.</div>
-        </div>
-        <form class="chatbot-form" id="chatbot-form">
-            <label class="sr-only" for="chatbot-input">Mesaj</label>
-            <input id="chatbot-input" type="text" maxlength="1000" placeholder="Sorunu sor..." aria-label="Soru girdisi">
-            <button type="submit">Gönder</button>
-        </form>
-    </aside>
+    {% if user.is_authenticated %}
+        <button class="chatbot-launcher" type="button" aria-label="Asistan aç">💬</button>
+        <aside class="chatbot-panel" id="chatbot-panel" aria-live="polite">
+            <div class="chatbot-header">
+                <strong>İklimKiti Asistanı</strong>
+                <button type="button" class="close-chat" aria-label="Kapat">×</button>
+            </div>
+            <div class="chatbot-body" id="chatbot-body">
+                <div class="message bot">Merhaba! Gıda ve iklim konularında sana yardımcı olabilirim.</div>
+                <div class="message bot">Güvenlik için mesajların hesabınla ilişkilendirilerek yönetici kayıtlarında saklanır. +18 veya hakaret içeren mesajlar engellenir.</div>
+            </div>
+            <form class="chatbot-form" id="chatbot-form">
+                <label class="sr-only" for="chatbot-input">Mesaj</label>
+                <input id="chatbot-input" type="text" maxlength="1000" placeholder="Sorunu sor..." aria-label="Soru girdisi">
+                <button type="submit">Gönder</button>
+            </form>
+        </aside>
+    {% endif %}
 
     <footer class="site-footer">
         <div class="container footer-row">

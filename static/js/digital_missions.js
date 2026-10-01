@@ -68,6 +68,10 @@
             feedback.hidden = false;
             feedback.className = `mission-feedback ${isCorrect ? 'is-correct' : 'is-review'}`;
             feedback.textContent = `${isCorrect ? 'Güçlü karar.' : 'Bir kez daha düşün.'} ${explanations[mission]}`;
+            card.classList.toggle('mission-complete', isCorrect);
+            if (isCorrect && typeof window.celebrateSuccess === 'function') {
+                window.celebrateSuccess('Doğru karar! Görev tamamlandı 🎉');
+            }
             updateSummary();
         });
     });
