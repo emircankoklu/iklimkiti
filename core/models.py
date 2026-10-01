@@ -26,11 +26,11 @@ class ChatPromptLog(models.Model):
 class HomePageContent(models.Model):
 	hero_tag = models.CharField(max_length=120, default='Gıda güvenliği ve iklim eğitimi')
 	hero_title = models.CharField(max_length=255, default='Gıdanın yolculuğunu öğren, geleceği birlikte koru.')
-	hero_description = models.TextField(default='İklimKiti ile gıda güvenliği, sürdürülebilir yaşam ve iklim değişikliği hakkında öğren, keşfet ve oyunlarla kendini geliştir.')
+	hero_description = models.TextField(default='İklim Tabağım ile gıda güvenliği, sürdürülebilir yaşam ve iklim değişikliği hakkında öğren, keşfet ve oyunlarla kendini geliştir.')
 	relationship_title = models.CharField(max_length=200, default='Gıda ve iklim ilişkisi')
 	relationship_lead = models.CharField(max_length=255, default='Yediğimiz her gıdanın arkasında su, toprak, enerji, emek ve taşıma süreçleri bulunur.')
 	relationship_body = models.TextField(blank=True, default='Bu süreçleri tanımak, hem kendi seçimlerimizi hem de gezegenimizin geleceğini daha bilinçli değerlendirmemize yardımcı olur.')
-	assistant_title = models.CharField(max_length=200, default='İklimKiti Asistanı')
+	assistant_title = models.CharField(max_length=200, default='İklim Tabağım Asistanı')
 	assistant_description = models.TextField(default='Gıda güvenliği, gıda israfı, su kaynakları ve sürdürülebilir yaşam hakkında kısa sorular sorabilirsiniz.')
 	is_active = models.BooleanField(default=True)
 	updated_at = models.DateTimeField(auto_now=True)

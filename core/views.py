@@ -62,17 +62,22 @@ def chatbot_api(request):
     if len(message) > 1000:
         return JsonResponse({'error': 'Mesaj çok uzun.'}, status=400)
 
+    service = ChatbotService()
+    if not service.is_appropriate(message):
+        ChatPromptLog.objects.create(
+            user=request.user,
+            prompt=message,
+            status='blocked',
+        )
+        return JsonResponse({'reply': service.REFUSAL_RESPONSE})
+    if not service.is_on_topic(message):
+        return JsonResponse({'reply': service.SCOPE_RESPONSE})
+
     prompt_log = ChatPromptLog.objects.create(
         user=request.user,
         prompt=message,
         status='received',
     )
-    service = ChatbotService()
-    if not service.is_appropriate(message):
-        prompt_log.status = 'blocked'
-        prompt_log.save(update_fields=['status'])
-        return JsonResponse({'reply': service.REFUSAL_RESPONSE})
-
     try:
         response = service.ask(message)
     except ValueError as exc:

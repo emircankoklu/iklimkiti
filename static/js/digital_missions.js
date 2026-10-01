@@ -51,8 +51,26 @@
         const mission = card.dataset.mission;
         const form = card.querySelector('form');
         const feedback = card.querySelector('.mission-feedback');
+
+        const completeMission = selectedValue => {
+            const selectedAnswer = form.querySelector(`input[type="radio"][value="${selectedValue}"]`);
+            if (selectedAnswer) selectedAnswer.checked = true;
+            form.querySelectorAll('input, button').forEach(control => {
+                control.disabled = true;
+            });
+            feedback.hidden = false;
+            feedback.className = 'mission-feedback is-correct';
+            feedback.textContent = `Güçlü karar. ${explanations[mission]}`;
+            card.classList.add('mission-complete');
+        };
+
+        if (progress.latest[mission] === correctAnswers[mission]) {
+            completeMission(progress.latest[mission]);
+        }
+
         form.addEventListener('submit', event => {
             event.preventDefault();
+            if (card.classList.contains('mission-complete')) return;
             const selected = form.querySelector('input[type="radio"]:checked');
             if (!selected) {
                 feedback.hidden = false;
@@ -68,9 +86,11 @@
             feedback.hidden = false;
             feedback.className = `mission-feedback ${isCorrect ? 'is-correct' : 'is-review'}`;
             feedback.textContent = `${isCorrect ? 'Güçlü karar.' : 'Bir kez daha düşün.'} ${explanations[mission]}`;
-            card.classList.toggle('mission-complete', isCorrect);
-            if (isCorrect && typeof window.celebrateSuccess === 'function') {
-                window.celebrateSuccess('Doğru karar! Görev tamamlandı 🎉');
+            if (isCorrect) {
+                completeMission(selected.value);
+                if (typeof window.celebrateSuccess === 'function') {
+                    window.celebrateSuccess('Doğru karar! Görev tamamlandı 🎉');
+                }
             }
             updateSummary();
         });

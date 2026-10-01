@@ -1,2 +1,2 @@
-# iklimkiti
-İklimKiti: Gıda güvenliği, iklim eğitimi ve etkileşimli öğrenme platformu.
+# İklim Tabağım
+İklim Tabağım: Gıda güvenliği, iklim eğitimi ve etkileşimli öğrenme platformu.

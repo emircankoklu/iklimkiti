@@ -10,6 +10,26 @@ class CoreViewTests(TestCase):
     def test_homepage_loads(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'İklim Tabağım')
+        self.assertContains(response, 'images/iklim-tabagim-logo.png')
+        self.assertNotContains(response, 'İklimKiti')
+
+    def test_assistant_entry_points_are_hidden_without_login(self):
+        response = self.client.get('/')
+
+        self.assertNotContains(response, 'Asistanı aç')
+        self.assertNotContains(response, 'İklim Tabağım Asistanına Sor')
+        self.assertNotContains(response, '>Asistan</a>')
+
+    def test_assistant_entry_points_are_visible_after_login(self):
+        user = get_user_model().objects.create_user(username='chatuser', password='StrongPass!123')
+        self.client.force_login(user)
+
+        response = self.client.get('/')
+
+        self.assertContains(response, 'Asistanı aç')
+        self.assertContains(response, 'İklim Tabağım Asistanına Sor')
+        self.assertContains(response, '>Asistan</a>')
 
     def test_digital_missions_are_available_without_login(self):
         response = self.client.get('/dijital-gorevler/')
@@ -57,6 +77,18 @@ class CoreViewTests(TestCase):
         self.assertEqual(log.user, user)
         self.assertEqual(log.prompt, 'Bana porno anlat')
         self.assertEqual(log.status, 'blocked')
+
+    @patch('core.views.ChatbotService.ask')
+    def test_off_topic_prompt_is_not_answered_or_logged(self, ask):
+        user = get_user_model().objects.create_user(username='chatuser', password='StrongPass!123')
+        self.client.force_login(user)
+
+        response = self.client.post('/api/chatbot/', {'message': 'Futbol maçını kim kazandı?'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('yalnızca iklim, gıda, su, tarım', response.json()['reply'])
+        ask.assert_not_called()
+        self.assertEqual(ChatPromptLog.objects.count(), 0)
 
     def test_admin_can_clear_all_prompt_logs_with_single_action(self):
         user = get_user_model().objects.create_superuser('admin', 'admin@example.com', 'StrongPass!123')

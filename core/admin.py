@@ -96,6 +96,6 @@ class GuideSectionAdmin(admin.ModelAdmin):
 	list_filter = ('is_published', 'eyebrow')
 	search_fields = ('title', 'body', 'prompt')
 	list_editable = ('order', 'score_weight', 'is_published')
-admin.site.site_header = 'İklimKiti içerik yönetimi'
-admin.site.site_title = 'İklimKiti yönetimi'
+admin.site.site_header = 'İklim Tabağım içerik yönetimi'
+admin.site.site_title = 'İklim Tabağım yönetimi'
 admin.site.index_title = 'İçerik merkezi'
