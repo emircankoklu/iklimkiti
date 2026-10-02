@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
+from games.catalog import STANDALONE_GAMES
 from games.engine import GameRegistry
 from games.models import GameProgress, MiniGame
 from games.services import complete_game_for_user, get_user_progress
@@ -16,7 +17,28 @@ def game_list(request):
     query = request.GET.get('q', '').strip()
     if query:
         queryset = queryset.filter(title__icontains=query)
-    return render(request, 'games/game_list.html', {'games': queryset, 'query': query})
+    standalone_games = STANDALONE_GAMES
+    if query:
+        standalone_games = [
+            game for game in standalone_games
+            if query.casefold() in game['title'].casefold()
+            or query.casefold() in game['description'].casefold()
+        ]
+    return render(request, 'games/game_list.html', {
+        'games': queryset,
+        'standalone_games': standalone_games,
+        'query': query,
+    })
+
+
+@login_required
+def food_storage_game(request):
+    return render(request, 'games/food_storage_game.html')
+
+
+@login_required
+def waste_detective_game(request):
+    return render(request, 'games/waste_detective_game.html')
 
 
 def game_detail(request, slug):

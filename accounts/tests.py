@@ -2,6 +2,13 @@ from django.test import TestCase
 
 
 class AccountTests(TestCase):
+    def test_login_page_includes_hidden_culture_easter_egg(self):
+        response = self.client.get('/giris/')
+
+        self.assertContains(response, 'id="culture-egg"')
+        self.assertContains(response, 'Hava Nagila')
+        self.assertContains(response, 'hidden')
+
     def test_user_can_register(self):
         response = self.client.post('/kayit/', {
             'username': 'newuser',

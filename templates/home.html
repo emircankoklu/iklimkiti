@@ -119,6 +119,14 @@
             <a href="{% url 'game_list' %}">Hepsini gör</a>
         </div>
         <div class="grid grid-3">
+            {% for game in standalone_games %}
+            <article class="card">
+                <span class="tag">Mini oyun</span>
+                <h3>{{ game.title }}</h3>
+                <p>{{ game.description|truncatechars:120 }}</p>
+                <a href="{% url game.url_name %}">Oyna →</a>
+            </article>
+            {% endfor %}
             {% for game in games %}
             <article class="card">
                 <span class="tag">{{ game.game_type }}</span>
@@ -127,7 +135,9 @@
                 <a href="{% url 'game_detail' game.slug %}">Oyna →</a>
             </article>
             {% empty %}
+            {% if not standalone_games %}
             <div class="empty-state">Yayında oyun bulunmuyor.</div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>

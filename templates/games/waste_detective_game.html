@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2c1e14">
+  <title>İklim Tabağım • İsraf Dedektifi</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #3b2a1a;
+      background: #202c24;
+      --cream: #fdf6e6;
+      --green: #2f8f4e;
+      --wood: #8b5e3c;
+      --nav: #2c1e14;
+      --red: #e11d2e;
+      --gold: #e8a72c;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-width: 320px;
+      margin: 0;
+      overflow: hidden;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    [hidden] { display: none !important; }
+    .app {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .topbar {
+      min-height: 64px;
+      flex: 0 0 auto;
+      padding: 10px clamp(12px, 3vw, 30px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      color: white;
+      background: #2c1e14ed;
+    }
+    .brand { line-height: 1.2; color: inherit; text-decoration: none; }
+    .brand strong { display: block; color: #5fd68a; font-size: .78rem; letter-spacing: .08em; }
+    .brand span { font-size: 1.15rem; font-weight: 750; }
+    .hud { display: flex; align-items: center; gap: clamp(10px, 2vw, 24px); }
+    .stat { text-align: center; white-space: nowrap; }
+    .stat small { display: block; color: #e9dcc3; font-size: .68rem; font-weight: 700; letter-spacing: .05em; }
+    .stat strong { font-size: 1.1rem; }
+    .progress { width: clamp(76px, 13vw, 170px); }
+    progress { width: 100%; height: 9px; accent-color: #3fa357; }
+    .button {
+      min-height: 44px;
+      padding: 9px 15px;
+      border: 2px solid var(--wood);
+      border-radius: 12px;
+      color: #3b2a1a;
+      background: white;
+      cursor: pointer;
+      font-weight: 750;
+      touch-action: manipulation;
+    }
+    .button:hover { background: #eef9ef; border-color: var(--green); }
+    .button.primary { color: white; background: var(--green); border-color: var(--green); }
+    .button.primary:hover { background: #267b41; }
+    main {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      overflow: hidden;
+    }
+    .card {
+      width: min(100%, 760px);
+      padding: clamp(22px, 5vw, 44px);
+      border: 2px solid var(--wood);
+      border-radius: 24px;
+      background: #fdf6e6f7;
+      box-shadow: 0 16px 42px #0008;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      color: white;
+      background: var(--red);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    h1 { margin: 18px 0 6px; color: var(--green); font-size: clamp(2rem, 8vw, 3rem); }
+    h2 { margin: 8px 0 18px; font-size: clamp(1.25rem, 5vw, 1.8rem); }
+    p { line-height: 1.55; }
+    .food { margin: 14px 0; font-size: 1.5rem; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .primary { min-width: min(100%, 240px); }
+    .help {
+      max-width: 580px;
+      margin: 18px auto 0;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: #fff9;
+      text-align: left;
+    }
+    .help ul { margin-bottom: 0; padding-left: 22px; }
+    .scene-shell {
+      width: min(100%, 1500px);
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      margin: auto;
+    }
+    .scene-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 auto 8px;
+      color: #fff;
+      font-size: .85rem;
+      flex: 0 0 auto;
+    }
+    .zoom-controls { display: flex; gap: 6px; }
+    .zoom-controls .button { min-width: 44px; min-height: 40px; padding: 6px 12px; }
+    .scene-viewport {
+      max-width: 100%;
+      width: 100%;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      border: 2px solid #fdf6e680;
+      border-radius: 12px;
+      background: #172018;
+      touch-action: pan-x pan-y pinch-zoom;
+      scrollbar-color: #d9c8a4 #30251b;
+    }
+    .scene {
+      position: relative;
+      width: 100%;
+      line-height: 0;
+      margin: auto;
+      --scene-scale: 1;
+    }
+    .scene img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1671 / 941;
+      user-select: none;
+    }
+    #hint-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hotspot {
+      position: absolute;
+      z-index: 1;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      background: transparent;
+      transform: translate(-50%, -50%);
+      cursor: crosshair;
+      touch-action: manipulation;
+    }
+    .hotspot:hover:not(:disabled), .hotspot:focus-visible { border-color: #f4c95d; background: #f4c95d26; }
+    .hotspot.found {
+      z-index: 2;
+      border: 4px solid var(--red);
+      background: #e11d2e1c;
+      animation: pop .32s ease-out;
+    }
+    .found-label {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      padding: 5px 8px;
+      border-radius: 7px;
+      color: white;
+      background: var(--red);
+      font-size: 11px;
+      font-weight: 750;
+      line-height: 1.2;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .miss-marker {
+      position: absolute;
+      z-index: 3;
+      width: 32px;
+      height: 32px;
+      border: 3px solid #ff5a5a;
+      border-radius: 50%;
+      color: #ff5a5a;
+      font-size: 24px;
+      line-height: 26px;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: fade .8s forwards;
+    }
+    @keyframes pop { from { scale: .5; } to { scale: 1; } }
+    @keyframes fade { to { opacity: 0; } }
+    .message {
+      min-height: 20px;
+      flex: 0 0 auto;
+      margin: 4px 0 0;
+      color: #fff;
+      text-align: center;
+      font-size: .85rem;
+    }
+    .footer {
+      padding: 10px 14px max(10px, env(safe-area-inset-bottom));
+      color: #e9dcc3;
+      background: #2c1e14ed;
+      text-align: center;
+      font-size: .82rem;
+    }
+    .desktop-only { display: inline-flex; }
+    .footer { flex: 0 0 auto; }
+    .result-stars { color: var(--gold); font-size: 2rem; }
+    .result-score { color: #c8860d; font-size: 1.5rem; font-weight: 850; }
+    @media (max-width: 650px), (pointer: coarse) {
+      .topbar { min-height: 58px; padding: 6px 10px; }
+      .brand span { font-size: .96rem; }
+      .hud { gap: 8px; }
+      .stat strong { font-size: .95rem; }
+      .stat small { font-size: .62rem; }
+      .progress { width: 70px; }
+      .desktop-only, .desktop-hint { display: none !important; }
+      main { padding: 6px 8px; }
+      .card { border-radius: 18px; padding: 22px 16px; }
+      .scene-tools { gap: 6px; margin-bottom: 5px; font-size: .72rem; }
+      .scene-viewport { border-radius: 8px; }
+      .message { min-height: 18px; margin-top: 3px; font-size: .78rem; }
+    }
+    @media (max-height: 520px) {
+      .topbar { min-height: 48px; padding-top: 4px; padding-bottom: 4px; }
+      .brand strong { font-size: .65rem; }
+      .brand span { font-size: .88rem; }
+      main { padding-top: 4px; padding-bottom: 4px; }
+      .scene-tools { margin-bottom: 3px; }
+      .button { min-height: 38px; padding: 6px 10px; }
+      .message { min-height: 16px; margin-top: 2px; font-size: .72rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="{% url 'game_list' %}" aria-label="Oyunlara dön"><strong>İKLİM TABAĞIM</strong><span>İsraf Dedektifi</span></a>
+      <div class="hud" id="hud" hidden>
+        <div class="stat progress"><small id="found-label">BULUNAN 0/9</small><progress id="progress" max="9" value="0" aria-label="Bulunan nesneler"></progress></div>
+        <div class="stat"><small>SÜRE</small><strong id="timer">0:00</strong></div>
+        <div class="stat"><small>HATA</small><strong id="misses">0</strong></div>
+        <button class="button desktop-only" id="fullscreen" type="button">Tam ekran</button>
+      </div>
+    </header>
+    <main>
+      <section class="card" id="menu" aria-labelledby="menu-title">
+        <span class="eyebrow">GİZLİ NESNE / BULMACA</span>
+        <h1 id="menu-title">İKLİM TABAĞIM</h1>
+        <h2>İsraf Dedektifi</h2>
+        <div class="food" aria-hidden="true">🔍 🍞 🥛 🍌 🗑️</div>
+        <p>Gıda israfına neden olan durumları bul ve düzelt.</p>
+        <div class="actions">
+          <button class="button primary" id="start" type="button">▶ OYNA</button>
+          <button class="button" id="help-toggle" type="button" aria-expanded="false" aria-controls="help">NASIL OYNANIR</button>
+        </div>
+        <div class="help" id="help" hidden>
+          <strong>Nasıl oynanır?</strong>
+          <ul>
+            <li>Sahnedeki 9 israf kaynağını bul ve üzerlerine dokun.</li>
+            <li>Hatalı tıklama yapmadan mümkün olduğunca hızlı bitir.</li>
+            <li>3 ipucun var. Telefonda İPUCU düğmesine, bilgisayarda H tuşuna basabilirsin.</li>
+            <li>Telefonda sahneyi büyütmek için + düğmesini kullan.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="scene-shell" id="game" hidden aria-label="Gizli nesne oyun alanı">
+        <div class="scene-tools">
+          <span id="hint-status" aria-live="polite">İsrafı bul</span>
+          <div class="actions">
+            <div class="zoom-controls" id="zoom-controls" aria-label="Sahne yakınlaştırma">
+              <button class="button" id="zoom-out" type="button" aria-label="Uzaklaştır">−</button>
+              <button class="button" id="zoom-in" type="button" aria-label="Yakınlaştır">+</button>
+            </div>
+            <button class="button" id="hint" type="button">İPUCU (3)</button>
+          </div>
+        </div>
+        <div class="scene-viewport" id="scene-viewport">
+          <div class="scene" id="scene">
+            <img id="scene-image" width="1671" height="941" src="{% static 'images/SecondGameImage_Spoiled.png' %}" data-local-src="SecondGameImage_Spoiled.png" alt="Mutfak sahnesi: bozulmaya yüz tutmuş süt ve meyveler, eski kavanoz ile israf edilen diğer yiyecekler." draggable="false">
+            <div id="hotspots"></div>
+          </div>
+        </div>
+        <p class="message" id="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card" id="result" aria-labelledby="result-title" hidden>
+        <span class="eyebrow">SONUÇ</span>
+        <h2 id="result-title">HEPSİNİ TOPLADIN!</h2>
+        <p class="result-stars" id="stars"></p>
+        <p id="result-found"></p>
+        <p class="result-score" id="result-time"></p>
+        <p id="result-message"></p>
+        <p style="color:#2f8f4e;font-weight:700">İsraf geleceğimizi yorar: gıdanı planla, artıkları değerlendir.</p>
+        <div class="actions">
+          <button class="button primary" id="replay" type="button">TEKRAR OYNA</button>
+          <button class="button" id="back-menu" type="button">ANA MENÜ</button>
+        </div>
+      </section>
+    </main>
+    <footer class="footer desktop-hint" id="footer">İsraf olan durumlara dokun • Bilgisayarda H tuşu ipucu verir</footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+      const imageWidth = 1671;
+      const imageHeight = 941;
+      const items = [
+        { id: "sut", label: "Bozulmak üzere olan süt", cx: 562, cy: 445, rx: 34, ry: 42 },
+        { id: "ekmek", label: "Bayat ekmek", cx: 316, cy: 336, rx: 82, ry: 52 },
+        { id: "meyve", label: "Çürümüş meyveler", cx: 456, cy: 462, rx: 92, ry: 60 },
+        { id: "tabak", label: "Yenmiş yemek artıkları", cx: 656, cy: 482, rx: 80, ry: 52 },
+        { id: "cips", label: "Açılmış ve bayat cips", cx: 776, cy: 466, rx: 86, ry: 56 },
+        { id: "kavanoz", label: "Bozulmaya yüz tutmuş kavanoz ürünü", cx: 1376, cy: 330, rx: 56, ry: 56 },
+        { id: "sise", label: "Yere düşen plastik şişe", cx: 1040, cy: 670, rx: 78, ry: 46 },
+        { id: "yogurt", label: "Dökülmüş yoğurt", cx: 940, cy: 776, rx: 72, ry: 60 },
+        { id: "kagit", label: "Kağıt atık", cx: 1376, cy: 856, rx: 62, ry: 56 }
+      ];
+      const $ = (id) => document.getElementById(id);
+      const menu = $("menu");
+      const game = $("game");
+      const result = $("result");
+      const scene = $("scene");
+      const image = $("scene-image");
+      const viewport = $("scene-viewport");
+      const hotspots = $("hotspots");
+      const mobileQuery = window.matchMedia("(max-width: 650px), (pointer: coarse)");
+      let mobileMode = mobileQuery.matches;
+      let zoom = 1;
+      let baseWidth = 0;
+      let found = new Set();
+      let misses = 0;
+      let hintsLeft = 3;
+      let startedAt = 0;
+      let timerId = null;
+      let hintTimeout = null;
+      let messageTimeout = null;
+      const imageFallbacks = window.location.protocol === "file:"
+        ? [image.dataset.localSrc, "SecondGameImage.png"]
+        : [image.dataset.localSrc, "/static/images/SecondGameImage.png"];
+      let imageFallbackIndex = 0;
+
+      mobileQuery.addEventListener?.("change", (event) => { mobileMode = event.matches; });
+      if (window.location.protocol === "file:") image.src = image.dataset.localSrc;
+      image.addEventListener("error", () => {
+        const fallback = imageFallbacks[imageFallbackIndex++];
+        if (fallback) image.src = fallback;
+        else $("hint-status").textContent = "Görsel bulunamadı. Görsel dosyalarını game2.html ile aynı klasöre koy veya Django static ayarlarını kontrol et.";
+      });
+
+      function show(view) {
+        menu.hidden = view !== "menu";
+        game.hidden = view !== "game";
+        result.hidden = view !== "result";
+        $("hud").hidden = view !== "game";
+        $("footer").hidden = view === "result";
+        if (view === "game") requestAnimationFrame(resizeScene);
+      }
+
+      function resizeScene() {
+        if (game.hidden) return;
+        const widthFit = viewport.clientWidth;
+        const heightFit = viewport.clientHeight * imageWidth / imageHeight;
+        baseWidth = Math.min(widthFit, heightFit, imageWidth);
+        if (!baseWidth) return;
+        viewport.style.overflow = zoom > 1 ? "auto" : "hidden";
+        if (zoom === 1) {
+          viewport.scrollLeft = 0;
+          viewport.scrollTop = 0;
+        }
+        scene.style.width = `${baseWidth * zoom}px`;
+        scene.style.setProperty("--scene-scale", String(baseWidth * zoom / imageWidth));
+        hotspots.replaceChildren();
+        for (const item of items) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "hotspot";
+          button.style.left = `${item.cx / imageWidth * 100}%`;
+          button.style.top = `${item.cy / imageHeight * 100}%`;
+          button.style.width = `${Math.max(44, item.rx * 2 * baseWidth * zoom / imageWidth)}px`;
+          button.style.height = `${Math.max(44, item.ry * 2 * baseWidth * zoom / imageWidth)}px`;
+          button.setAttribute("aria-label", `${item.label} israf kaynağını bul`);
+          button.dataset.item = item.id;
+          if (found.has(item.id)) {
+            button.disabled = true;
+            button.classList.add("found");
+            const label = document.createElement("span");
+            label.className = "found-label";
+            label.textContent = item.label;
+            button.append(label);
+          } else {
+            button.addEventListener("click", () => markFound(item));
+          }
+          hotspots.append(button);
+        }
+      }
+
+      function startGame() {
+        clearInterval(timerId);
+        clearTimeout(hintTimeout);
+        clearTimeout(messageTimeout);
+        found = new Set();
+        misses = 0;
+        hintsLeft = 3;
+        zoom = 1;
+        startedAt = Date.now();
+        $("hint").textContent = "İPUCU (3)";
+        $("hint").disabled = false;
+        $("hint-status").textContent = "İsrafı bul";
+        $("message").textContent = "";
+        updateHud();
+        show("game");
+        image.addEventListener("load", resizeScene, { once: true });
+        if (image.complete) requestAnimationFrame(resizeScene);
+        timerId = window.setInterval(updateHud, 1000);
+      }
+
+      function updateHud() {
+        const seconds = Math.floor((Date.now() - startedAt) / 1000);
+        $("timer").textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+        $("misses").textContent = String(misses);
+        $("found-label").textContent = `BULUNAN ${found.size}/${items.length}`;
+        $("progress").value = found.size;
+      }
+
+      function markFound(item) {
+        if (found.has(item.id)) return;
+        found.add(item.id);
+        $("hint-status").textContent = `Bulundu: ${item.label}`;
+        $("message").textContent = `✓ ${item.label}`;
+        if (messageTimeout) clearTimeout(messageTimeout);
+        messageTimeout = window.setTimeout(() => { $("message").textContent = ""; }, 1700);
+        updateHud();
+        resizeScene();
+        if (found.size === items.length) finishGame();
+      }
+
+      function markMiss(event) {
+        misses += 1;
+        updateHud();
+        $("message").textContent = "Burada israf yok, başka bir yere bak.";
+        if (messageTimeout) clearTimeout(messageTimeout);
+        messageTimeout = window.setTimeout(() => { $("message").textContent = ""; }, 1200);
+        const bounds = image.getBoundingClientRect();
+        const marker = document.createElement("span");
+        marker.className = "miss-marker";
+        marker.textContent = "×";
+        marker.style.left = `${(event.clientX - bounds.left) / bounds.width * 100}%`;
+        marker.style.top = `${(event.clientY - bounds.top) / bounds.height * 100}%`;
+        hotspots.append(marker);
+        window.setTimeout(() => marker.remove(), 850);
+      }
+
+      function useHint() {
+        if (game.hidden || hintsLeft < 1) return;
+        const target = items.find((item) => !found.has(item.id));
+        if (!target) return;
+        hintsLeft -= 1;
+        $("hint").textContent = `İPUCU (${hintsLeft})`;
+        $("hint-status").textContent = `İpucu: ${target.label}`;
+        const button = hotspots.querySelector(`[data-item="${target.id}"]`);
+        if (button) {
+          button.classList.add("hinted");
+          button.style.borderColor = "#f4c95d";
+          button.style.background = "#f4c95d55";
+          hintTimeout = window.setTimeout(() => {
+            if (button.isConnected && !found.has(target.id)) {
+              button.style.borderColor = "";
+              button.style.background = "";
+            }
+          }, 2500);
+        }
+        if (!hintsLeft) $("hint").disabled = true;
+      }
+
+      function finishGame() {
+        clearInterval(timerId);
+        const seconds = Math.floor((Date.now() - startedAt) / 1000);
+        const starCount = misses === 0 ? 3 : misses <= 3 ? 2 : 1;
+        $("stars").textContent = "★".repeat(starCount) + "☆".repeat(3 - starCount);
+        $("result-found").textContent = `${found.size}/${items.length} israf bulundu • Hatalı tıklama: ${misses}`;
+        $("result-time").textContent = `Süre: ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+        $("result-message").textContent = starCount === 3
+          ? "Mükemmel! Hiç hata yapmadın, gerçek bir israf dedektifisin."
+          : starCount === 2
+            ? "Çok iyi! Küçük eksiklerini tekrar oynayarak kapatabilirsin."
+            : "İyi başlangıç! Tekrar dene, daha az hata yapabilirsin.";
+        show("result");
+        $("replay").focus();
+      }
+
+      $("start").addEventListener("click", startGame);
+      $("replay").addEventListener("click", startGame);
+      $("back-menu").addEventListener("click", () => {
+        clearInterval(timerId);
+        show("menu");
+      });
+      $("help-toggle").addEventListener("click", () => {
+        const help = $("help");
+        help.hidden = !help.hidden;
+        $("help-toggle").setAttribute("aria-expanded", String(!help.hidden));
+        $("help-toggle").textContent = help.hidden ? "NASIL OYNANIR" : "KAPAT";
+      });
+      $("hint").addEventListener("click", useHint);
+      $("zoom-in").addEventListener("click", () => {
+        zoom = Math.min(2.5, Math.round((zoom + 0.25) * 100) / 100);
+        resizeScene();
+      });
+      $("zoom-out").addEventListener("click", () => {
+        zoom = Math.max(1, Math.round((zoom - 0.25) * 100) / 100);
+        resizeScene();
+      });
+      $("fullscreen").addEventListener("click", async () => {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.();
+        else await document.exitFullscreen?.();
+      });
+      document.addEventListener("fullscreenchange", () => {
+        $("fullscreen").textContent = document.fullscreenElement ? "Tam ekrandan çık" : "Tam ekran";
+      });
+      $("scene-image").addEventListener("click", (event) => {
+        if (event.target === image && !game.hidden) markMiss(event);
+      });
+      $("hotspots").addEventListener("click", (event) => {
+        if (event.target === hotspots && !game.hidden) markMiss(event);
+      });
+      document.addEventListener("keydown", (event) => {
+        if (mobileMode || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (!game.hidden && event.key.toLowerCase() === "h") useHint();
+        else if (!menu.hidden && event.key === "Enter") startGame();
+        else if (!result.hidden && (event.code === "Space" || event.key === "Enter")) startGame();
+      });
+      new ResizeObserver(() => {
+        if (!game.hidden) resizeScene();
+      }).observe(viewport);
+    })();
+  </script>
+</body>
+</html>

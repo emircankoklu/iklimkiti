@@ -33,6 +33,35 @@ class GameViewTests(TestCase):
         response = self.client.get(reverse('game_list'))
         self.assertEqual(response.status_code, 200)
 
+    def test_standalone_games_appear_in_game_list_and_can_be_searched(self):
+        from django.urls import reverse
+
+        response = self.client.get(reverse('game_list'))
+        self.assertContains(response, 'Gıdanı Doğru Sakla')
+        self.assertContains(response, 'İsraf Dedektifi')
+
+        response = self.client.get(reverse('game_list'), {'q': 'dedektif'})
+        self.assertContains(response, 'İsraf Dedektifi')
+        self.assertNotContains(response, 'Gıdanı Doğru Sakla')
+
+    def test_standalone_games_require_login_and_render_for_authenticated_users(self):
+        from django.contrib.auth import get_user_model
+        from django.urls import reverse
+
+        routes = ('food_storage_game', 'waste_detective_game')
+        for route in routes:
+            response = self.client.get(reverse(route))
+            self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.create_user(
+            username='gameuser',
+            password='StrongPass!123',
+        )
+        self.client.force_login(user)
+        for route in routes:
+            response = self.client.get(reverse(route))
+            self.assertEqual(response.status_code, 200)
+
     def test_matching_game_is_not_listed(self):
         from django.urls import reverse
         topic = GameModelTests._make_topic('İklim ve Gıda')

@@ -68,6 +68,15 @@ class CoreViewTests(TestCase):
         self.assertContains(response, 'images/iklim-tabagim-logo.png')
         self.assertNotContains(response, 'İklimKiti')
 
+    def test_standalone_games_are_featured_on_homepage(self):
+        response = self.client.get('/')
+
+        self.assertContains(response, 'Gıdanı Doğru Sakla')
+        self.assertContains(response, 'İsraf Dedektifi')
+        self.assertContains(response, '/oyunlar/gidani-dogru-sakla/')
+        self.assertContains(response, '/oyunlar/israf-dedektifi/')
+        self.assertNotContains(response, 'Yayında oyun bulunmuyor.')
+
     def test_assistant_entry_points_are_hidden_without_login(self):
         response = self.client.get('/')
 

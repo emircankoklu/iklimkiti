@@ -12,6 +12,14 @@
             <input type="search" placeholder="Oyun ara..." value="{{ query }}">
         </div>
         <div class="grid grid-3">
+            {% for game in standalone_games %}
+            <article class="card">
+                <span class="tag">Mini oyun</span>
+                <h3>{{ game.title }}</h3>
+                <p>{{ game.description }}</p>
+                <a href="{% url game.url_name %}">Oyunu aç →</a>
+            </article>
+            {% endfor %}
             {% for game in games %}
             <article class="card">
                 <span class="tag">{{ game.game_type }}</span>
@@ -24,7 +32,9 @@
                 {% endif %}
             </article>
             {% empty %}
+            {% if not standalone_games %}
             <div class="empty-state">Yayında oyun bulunmuyor.</div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>

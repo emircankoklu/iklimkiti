@@ -29,7 +29,33 @@ window.celebrateSuccess = function (message = 'Harika iş!') {
     window.setTimeout(() => banner.remove(), 2600);
 };
 
+function renderBotReply(element, text) {
+    const boldPattern = /\*\*(.+?)\*\*/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = boldPattern.exec(text)) !== null) {
+        element.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        const strong = document.createElement('strong');
+        strong.textContent = match[1];
+        element.appendChild(strong);
+        lastIndex = boldPattern.lastIndex;
+    }
+
+    element.appendChild(document.createTextNode(text.slice(lastIndex)));
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    const usernameInput = document.querySelector('.form-card input[name="username"]');
+    const cultureEgg = document.querySelector('#culture-egg');
+    if (usernameInput && cultureEgg) {
+        const updateCultureEgg = function () {
+            cultureEgg.hidden = usernameInput.value.trim().toLocaleLowerCase('tr-TR') !== 'yahu';
+        };
+        usernameInput.addEventListener('input', updateCultureEgg);
+        updateCultureEgg();
+    }
+
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
     if (navToggle && navLinks) {
@@ -91,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        window.matchMedia('(min-width: 761px)').addEventListener('change', function (event) {
+        window.matchMedia('(min-width: 1101px)').addEventListener('change', function (event) {
             if (event.matches) closeMenu();
         });
     }
@@ -158,7 +184,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) {
                     throw new Error(data.error || 'Hata');
                 }
-                status.textContent = data.reply;
+                status.textContent = '';
+                renderBotReply(status, data.reply);
             } catch (error) {
                 status.textContent = 'İklim Tabağım Asistanı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin veya konu sayfalarındaki güvenilir kaynakları inceleyin.';
             }

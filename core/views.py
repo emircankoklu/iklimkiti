@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from core.services.chatbot import ChatbotService
 from core.services.invoice_analysis import InvoiceAnalysisService, InvoiceImageResult
 from core.models import ChatPromptLog, HomePageContent, IdeathonGuide
+from games.catalog import STANDALONE_GAMES
 from games.models import MiniGame
 from learning.models import GlossaryTerm, MindMap, QuestionAnswer, Topic
 
@@ -22,7 +23,15 @@ def home(request):
     maps = MindMap.objects.filter(is_published=True)[:3]
     terms = GlossaryTerm.objects.filter(is_published=True)[:6]
     question_answers = QuestionAnswer.objects.filter(is_published=True).select_related('topic')[:4]
-    return render(request, 'home.html', {'topics': topics, 'games': games, 'maps': maps, 'terms': terms, 'question_answers': question_answers, 'homepage': homepage})
+    return render(request, 'home.html', {
+        'topics': topics,
+        'games': games,
+        'standalone_games': STANDALONE_GAMES,
+        'maps': maps,
+        'terms': terms,
+        'question_answers': question_answers,
+        'homepage': homepage,
+    })
 
 
 def digital_missions(request):
