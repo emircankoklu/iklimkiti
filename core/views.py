@@ -205,6 +205,13 @@ def invoice_analysis_api(request):
         weekly = daily * 7
         monthly_target = carbon * 0.9 * shower_factor
         verified_count = sum(analysis.status == 'verified' for analysis in analyses)
+        profile = {
+            'floor_position': floor_position,
+            'household_size': household_size,
+            'showers_per_week': showers_per_week,
+            **consumption,
+        }
+        ai_analysis, ai_generated = service.generate_personalized_analysis(profile, carbon, period_days)
         recommendations = [
             f'Elektrik: haftada iki kez çamaşır ve bulaşık makinesini tam dolu çalıştır; aylık yaklaşık %{min(18, 8 + household_size * 2)} tasarruf hedefle.',
             f'Gaz: termostatı 1°C düşür ve ara kattaysan ısıyı komşu dairelerden destekle; günlük {max(0.1, consumption["gas"] / period_days * 0.08):.1f} m³ azaltmayı dene.',
@@ -223,6 +230,8 @@ def invoice_analysis_api(request):
             },
             'recommendations': recommendations,
             'comparison': f'Bu tahmin, evinizin mevcut dönemdeki yaklaşık {carbon:.1f} kg CO₂e tüketimini temel alır. Kişi başına {per_person:.1f} kg CO₂e düşüyor.',
+            'ai_analysis': ai_analysis,
+            'ai_generated': ai_generated,
         })
     except (TypeError, ValueError) as exc:
         return JsonResponse({'error': str(exc)}, status=400)

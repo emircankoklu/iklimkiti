@@ -7,6 +7,12 @@ from typing import Any
 
 from django.conf import settings
 
+from core.services.chatbot import (
+    GeminiChatbotService,
+    NvidiaSafetyGuardChatbotService,
+    OpenRouterChatbotService,
+)
+
 try:
     import google.generativeai as genai
 except ImportError:  # pragma: no cover
@@ -31,6 +37,48 @@ class InvoiceAnalysisService:
     ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
     MAX_FILE_SIZE = 8 * 1024 * 1024
     FALLBACK_MESSAGE = 'Görsel yüklendi; AI doğrulaması yapılamadığı için fatura türü manuel kontrol bekliyor.'
+
+    def generate_personalized_analysis(self, profile: dict, carbon: float, period_days: int) -> tuple[str, bool]:
+        prompt = (
+            'Ev enerji ve su tüketimi için Türkçe, kişiye özel ve uygulanabilir bir değerlendirme yaz. '
+            'En fazla 3 kısa paragraf ve sonunda "İlk adım:" ile başlayan tek bir öneri ver. '
+            'Kullanıcının kat konumu, hane büyüklüğü, duş sıklığı, tüketim dağılımı ve karbon tahminini '
+            'birlikte yorumla. Sayıları değiştirme, tıbbi/finansal tavsiye verme, suçlayıcı olma. '
+            f'Profil: kat={profile["floor_position"]}, kişi={profile["household_size"]}, '
+            f'duş/hafta={profile["showers_per_week"]}; elektrik={profile["electricity"]} kWh, '
+            f'gaz={profile["gas"]} m³, su={profile["water"]} m³, dönem={period_days} gün, '
+            f'tahmini karbon={carbon:.1f} kg CO2e.'
+        )
+        provider = getattr(settings, 'INVOICE_AI_PROVIDER', 'gemini')
+        try:
+            if provider == 'nvidia' and getattr(settings, 'NVIDIA_API_KEY', ''):
+                result = NvidiaSafetyGuardChatbotService().ask(prompt)
+            elif provider == 'openrouter' and getattr(settings, 'OPENROUTER_API_KEY', ''):
+                result = OpenRouterChatbotService().ask(prompt)
+            elif getattr(settings, 'GEMINI_API_KEY', ''):
+                result = GeminiChatbotService().ask(prompt)
+            else:
+                return self._fallback_personalized_analysis(profile, carbon), False
+            if result and 'yanıt veremiyor' not in result.lower():
+                return result, True
+        except (ValueError, TypeError, OSError):
+            pass
+        return self._fallback_personalized_analysis(profile, carbon), False
+
+    @staticmethod
+    def _fallback_personalized_analysis(profile: dict, carbon: float) -> str:
+        floor_text = {'bottom': 'en alt katta', 'middle': 'ara katta', 'top': 'en üst katta'}[profile['floor_position']]
+        largest = max(
+            (('elektrik', profile['electricity']), ('gaz', profile['gas']), ('su', profile['water'])),
+            key=lambda item: item[1],
+        )[0]
+        return (
+            f'{profile["household_size"]} kişilik hanen için {floor_text} yaşamanın ısıtma davranışına '
+            f'etkisini ve haftada {profile["showers_per_week"]} duş alışkanlığını birlikte değerlendirdik. '
+            f'Yaklaşık {carbon:.1f} kg CO2e tahmininde en yüksek pay {largest} tüketiminde görünüyor. '
+            f'İlk adım: Bu hafta {largest} tüketimini her gün aynı saatte kontrol et ve bir sonraki dönemde '
+            f'küçük ama ölçülebilir bir düşüş hedefle.'
+        )
 
     def analyze_image(self, image_file) -> InvoiceImageResult:
         self.validate_image(image_file)

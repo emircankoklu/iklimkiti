@@ -6,6 +6,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const results = document.querySelector('#analysis-results');
     if (!form || !eInvoice || !eInvoiceFields || !status || !results) return;
 
+    eInvoiceFields.querySelectorAll('input[type="number"]').forEach(function (input) {
+        input.addEventListener('input', function () {
+            if (input.value === '') return;
+            const value = Number(input.value);
+            const maximum = Number(input.max);
+            if (Number.isFinite(value) && Number.isFinite(maximum) && value > maximum) {
+                input.value = String(maximum);
+            }
+            if (value < Number(input.min)) {
+                input.value = input.min;
+            }
+        });
+    });
+
     eInvoice.addEventListener('change', function () {
         eInvoiceFields.hidden = !eInvoice.checked;
         eInvoiceFields.querySelectorAll('input').forEach(function (input) {
@@ -60,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="carbon-summary"><div><strong>${data.carbon} kg</strong><span>Dönem tahmini</span></div><div><strong>${data.per_person_carbon} kg</strong><span>Kişi başına</span></div></div>
             <p class="comparison">${escapeHtml(data.comparison)}</p>
             <div class="target-grid"><div><strong>${data.targets.daily} kg</strong><span>Günlük hedef</span><small>Her gün 1 küçük adım</small></div><div><strong>${data.targets.weekly} kg</strong><span>Haftalık hedef</span><small>Haftalık tüketim kontrolü</small></div><div><strong>${data.targets.monthly} kg</strong><span>Aylık hedef</span><small>Bir sonraki faturada karşılaştır</small></div></div>
+            <div class="card ai-analysis"><div class="ai-analysis-heading"><h3>AI kişisel değerlendirmesi</h3><span>${data.ai_generated ? 'AI analizi' : 'Kişisel tahmin'}</span></div><p>${escapeHtml(data.ai_analysis)}</p></div>
             <div class="recommendation-grid"><div class="card"><h3>Bu hafta dene</h3><ul>${recommendations}</ul></div><div class="card"><h3>Görsel kontrolü</h3><ul>${messages}</ul></div></div>`;
     }
 

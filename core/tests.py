@@ -57,6 +57,9 @@ class CoreViewTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['review_count'], 3)
+        self.assertIn('2', response.json()['ai_analysis'])
+        self.assertIn('651.8', response.json()['ai_analysis'])
+        self.assertFalse(response.json()['ai_generated'])
 
     def test_homepage_loads(self):
         response = self.client.get('/')

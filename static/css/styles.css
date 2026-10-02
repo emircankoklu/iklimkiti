@@ -397,6 +397,11 @@ button, a, input, label { touch-action: manipulation; }
 .target-grid strong { font-size: 1.35rem; color: var(--color-primary); }
 .recommendation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .recommendation-grid ul { padding-left: 1.2rem; line-height: 1.65; }
+.ai-analysis { margin: 1rem 0; border: 1px solid rgba(25,195,177,.3); background: linear-gradient(135deg, #f1faf5, #fff); }
+.ai-analysis-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.ai-analysis-heading h3 { margin: 0; }
+.ai-analysis-heading span { padding: .35rem .65rem; border-radius: 999px; background: rgba(25,195,177,.15); color: var(--color-secondary); font-size: .8rem; font-weight: 700; white-space: nowrap; }
+.ai-analysis p { line-height: 1.75; white-space: pre-line; }
 
 @media (max-width: 900px) { .mission-grid { grid-template-columns: 1fr; } }
 @media (max-width: 900px) {
