@@ -1,3 +1,5 @@
+import math
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -7,7 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
 
 from core.services.chatbot import ChatbotService
-from core.services.invoice_analysis import InvoiceAnalysisService
+from core.services.invoice_analysis import InvoiceAnalysisService, InvoiceImageResult
 from core.models import ChatPromptLog, HomePageContent, IdeathonGuide
 from games.models import MiniGame
 from learning.models import GlossaryTerm, MindMap, QuestionAnswer, Topic
@@ -147,16 +149,28 @@ def invoice_analysis_api(request):
 
         e_invoice = request.POST.get('e_invoice') == 'on'
         if e_invoice:
-            for field in ('electricity_consumption', 'gas_consumption', 'water_consumption'):
+            consumption_limits = {
+                'electricity_consumption': ('Elektrik', 100_000),
+                'gas_consumption': ('Gaz', 100_000),
+                'water_consumption': ('Su', 10_000),
+            }
+            for field, (label, maximum) in consumption_limits.items():
                 value = float(request.POST.get(field, ''))
-                if value < 0:
-                    raise ValueError('Fatura tüketim değerleri negatif olamaz.')
+                if not math.isfinite(value) or value < 0 or value > maximum:
+                    raise ValueError(
+                        f'{label} tüketimi 0 ile {maximum:,} arasında olmalıdır.'
+                    )
         files = [request.FILES.get(name) for name in ('electricity_bill', 'gas_bill', 'water_bill')]
-        if any(file is None for file in files):
+        if not e_invoice and any(file is None for file in files):
             raise ValueError('Elektrik, gaz ve su için üç fatura görseli de yüklenmelidir.')
 
         service = InvoiceAnalysisService()
-        analyses = [service.analyze_image(file) for file in files]
+        analyses = [
+            service.analyze_image(file) if file else InvoiceImageResult(
+                'review', 'E-fatura verisi kullanıldı; görsel yüklenmedi.', {}
+            )
+            for file in files
+        ]
         invalid = [analysis.message for analysis in analyses if analysis.status == 'invalid']
         if invalid:
             return JsonResponse({'error': ' '.join(invalid)}, status=422)

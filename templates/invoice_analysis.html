@@ -48,15 +48,15 @@
             <p class="privacy-note">Net, tamamı görünen JPG, PNG veya WEBP fotoğrafları yükle. Her dosya en fazla 8 MB olabilir.</p>
             <div class="bill-upload-grid">
                 <label class="bill-upload">Elektrik faturası
-                    <input type="file" name="electricity_bill" accept="image/jpeg,image/png,image/webp" required>
+                    <input type="file" name="electricity_bill" accept="image/jpeg,image/png,image/webp">
                     <span class="file-name">Dosya seçilmedi</span>
                 </label>
                 <label class="bill-upload">Doğal gaz faturası
-                    <input type="file" name="gas_bill" accept="image/jpeg,image/png,image/webp" required>
+                    <input type="file" name="gas_bill" accept="image/jpeg,image/png,image/webp">
                     <span class="file-name">Dosya seçilmedi</span>
                 </label>
                 <label class="bill-upload">Su faturası
-                    <input type="file" name="water_bill" accept="image/jpeg,image/png,image/webp" required>
+                    <input type="file" name="water_bill" accept="image/jpeg,image/png,image/webp">
                     <span class="file-name">Dosya seçilmedi</span>
                 </label>
             </div>
@@ -65,9 +65,9 @@
                 <p>Seçersen faturandaki temel tüketim değerlerini girerek analizi kesinleştirebilirsin.</p>
             </div>
             <div class="e-invoice-fields" id="e-invoice-fields" hidden>
-                <label>Elektrik tüketimi (kWh / dönem)<input type="number" name="electricity_consumption" min="0" step="0.1"></label>
-                <label>Gaz tüketimi (m³ / dönem)<input type="number" name="gas_consumption" min="0" step="0.1"></label>
-                <label>Su tüketimi (m³ / dönem)<input type="number" name="water_consumption" min="0" step="0.1"></label>
+                <label>Elektrik tüketimi (kWh / dönem)<input type="number" name="electricity_consumption" min="0" max="100000" step="0.1" inputmode="decimal" placeholder="Örn. 240"></label>
+                <label>Gaz tüketimi (m³ / dönem)<input type="number" name="gas_consumption" min="0" max="100000" step="0.1" inputmode="decimal" placeholder="Örn. 120"></label>
+                <label>Su tüketimi (m³ / dönem)<input type="number" name="water_consumption" min="0" max="10000" step="0.1" inputmode="decimal" placeholder="Örn. 15"></label>
             </div>
             <button class="primary-btn" type="submit">Faturaları analiz et</button>
             <div class="form-status" id="invoice-status" role="status" aria-live="polite"></div>

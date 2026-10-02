@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', function () {
         eInvoiceFields.querySelectorAll('input').forEach(function (input) {
             input.required = eInvoice.checked;
         });
+        form.querySelectorAll('input[type="file"]').forEach(function (input) {
+            input.required = !eInvoice.checked;
+        });
+        const uploadGrid = form.querySelector('.bill-upload-grid');
+        const uploadNote = uploadGrid.previousElementSibling;
+        uploadGrid.hidden = eInvoice.checked;
+        uploadNote.hidden = eInvoice.checked;
     });
 
     form.querySelectorAll('input[type="file"]').forEach(function (input) {

@@ -28,6 +28,36 @@ class CoreViewTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('JPG, PNG veya WEBP', response.json()['error'])
 
+    def test_invoice_analysis_rejects_unrealistic_e_invoice_values(self):
+        user = get_user_model().objects.create_user(username='invoiceuser2', password='StrongPass!123')
+        self.client.force_login(user)
+        response = self.client.post('/api/fatura-analizi/', {
+            'floor_position': 'middle',
+            'household_size': '2',
+            'showers_per_week': '4',
+            'e_invoice': 'on',
+            'electricity_consumption': '240000000000000',
+            'gas_consumption': '120',
+            'water_consumption': '15',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Elektrik tüketimi', response.json()['error'])
+
+    def test_e_invoice_does_not_require_bill_images(self):
+        user = get_user_model().objects.create_user(username='invoiceuser3', password='StrongPass!123')
+        self.client.force_login(user)
+        response = self.client.post('/api/fatura-analizi/', {
+            'floor_position': 'middle',
+            'household_size': '2',
+            'showers_per_week': '4',
+            'e_invoice': 'on',
+            'electricity_consumption': '360',
+            'gas_consumption': '240',
+            'water_consumption': '60',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['review_count'], 3)
+
     def test_homepage_loads(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
