@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Fatura ve Karbon Analizi | İklim Tabağım{% endblock %}
+{% block content %}
+<section class="hero-compact invoice-hero">
+    <div class="container">
+        <span class="tag">AI destekli ev analizi</span>
+        <h1>Faturalarını yükle, karbon hedeflerini birlikte planlayalım.</h1>
+        <p class="narrow-copy">Elektrik, doğal gaz ve su faturalarının fotoğrafını yükle. Görselleri fatura olup olmadığı açısından kontrol edip tüketimini karbon ayak izinle karşılaştıralım.</p>
+    </div>
+</section>
+<section class="section">
+    <div class="container invoice-layout">
+        <form class="card invoice-form" id="invoice-form" enctype="multipart/form-data">
+            <div class="section-head">
+                <div>
+                    <p class="eyebrow">1 · Ev profilin</p>
+                    <h2>Günlük alışkanlıklarını tanıyalım</h2>
+                </div>
+                <span class="score-badge">3 adım</span>
+            </div>
+            <div class="invoice-fields">
+                <label>Evdeki kat konumu
+                    <select name="floor_position" required>
+                        <option value="">Seçin</option>
+                        <option value="bottom">En alt kat</option>
+                        <option value="middle">Ara kat</option>
+                        <option value="top">En üst kat</option>
+                    </select>
+                </label>
+                <label>Evde yaşayan kişi sayısı
+                    <select name="household_size" required>
+                        <option value="">Seçin</option>
+                        {% for number in "123456" %}<option value="{{ number }}">{{ number }} kişi</option>{% endfor %}
+                    </select>
+                </label>
+                <label>Ortalama duş sıklığı
+                    <select name="showers_per_week" required>
+                        <option value="">Seçin</option>
+                        {% for number in "123456789" %}<option value="{{ number }}">Haftada {{ number }} kez</option>{% endfor %}
+                        <option value="10">Haftada 10 kez</option>
+                        <option value="14">Haftada 14 kez</option>
+                    </select>
+                </label>
+            </div>
+
+            <p class="eyebrow">2 · Üç faturanın fotoğrafı</p>
+            <p class="privacy-note">Net, tamamı görünen JPG, PNG veya WEBP fotoğrafları yükle. Her dosya en fazla 8 MB olabilir.</p>
+            <div class="bill-upload-grid">
+                <label class="bill-upload">Elektrik faturası
+                    <input type="file" name="electricity_bill" accept="image/jpeg,image/png,image/webp" required>
+                    <span class="file-name">Dosya seçilmedi</span>
+                </label>
+                <label class="bill-upload">Doğal gaz faturası
+                    <input type="file" name="gas_bill" accept="image/jpeg,image/png,image/webp" required>
+                    <span class="file-name">Dosya seçilmedi</span>
+                </label>
+                <label class="bill-upload">Su faturası
+                    <input type="file" name="water_bill" accept="image/jpeg,image/png,image/webp" required>
+                    <span class="file-name">Dosya seçilmedi</span>
+                </label>
+            </div>
+            <div class="e-invoice-toggle">
+                <label><input type="checkbox" name="e_invoice" id="e-invoice"> E-fatura kullanıyorum</label>
+                <p>Seçersen faturandaki temel tüketim değerlerini girerek analizi kesinleştirebilirsin.</p>
+            </div>
+            <div class="e-invoice-fields" id="e-invoice-fields" hidden>
+                <label>Elektrik tüketimi (kWh / dönem)<input type="number" name="electricity_consumption" min="0" step="0.1"></label>
+                <label>Gaz tüketimi (m³ / dönem)<input type="number" name="gas_consumption" min="0" step="0.1"></label>
+                <label>Su tüketimi (m³ / dönem)<input type="number" name="water_consumption" min="0" step="0.1"></label>
+            </div>
+            <button class="primary-btn" type="submit">Faturaları analiz et</button>
+            <div class="form-status" id="invoice-status" role="status" aria-live="polite"></div>
+        </form>
+
+        <aside class="card invoice-help">
+            <span class="tag">Nasıl çalışır?</span>
+            <h2>Fotoğrafın sadece fatura olsun</h2>
+            <p>Görsel analizi, belgenin elektrik, gaz veya su faturası olup olmadığını kontrol eder. Fatura olmayan bir görsel yüklenirse hangi dosyanın değiştirilmesi gerektiğini söyler.</p>
+            <ul>
+                <li>Tüketimlerini kg CO₂e karşılığına çevirir.</li>
+                <li>Günlük, haftalık ve aylık ölçülebilir hedefler çıkarır.</li>
+                <li>Evdeki kişi sayısı ve duş alışkanlığına göre önerileri kişiselleştirir.</li>
+            </ul>
+            <p class="privacy-note">Fotoğraflar bu sayfada kalıcı olarak saklanmaz; analiz isteği sırasında işlenir.</p>
+        </aside>
+    </div>
+    <div class="container">
+        <section class="analysis-results" id="analysis-results" hidden></section>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}<script defer src="{% static 'js/invoice_analysis.js' %}"></script>{% endblock %}

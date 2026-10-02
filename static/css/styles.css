@@ -362,7 +362,49 @@ button, a, input, label { touch-action: manipulation; }
 .rubric-list { padding-left: 1.2rem; }
 .rubric-list li { margin: .75rem 0; line-height: 1.55; }
 
+.invoice-hero { background: linear-gradient(135deg, rgba(25,195,177,.12), rgba(55,214,122,.08)); }
+.invoice-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr); gap: 1.5rem; align-items: start; }
+.invoice-form { display: grid; gap: 1.2rem; }
+.invoice-form .section-head { margin-bottom: 0; }
+.invoice-fields, .e-invoice-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.invoice-fields label, .e-invoice-fields label { display: grid; gap: .35rem; font-weight: 600; }
+.invoice-fields select, .e-invoice-fields input { width: 100%; border: 1px solid #dbe5e1; border-radius: 12px; padding: .8rem .9rem; background: #fff; }
+.bill-upload-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.bill-upload { display: grid; gap: .6rem; padding: 1rem; border: 1px dashed #a9c9bd; border-radius: 15px; color: var(--color-secondary); cursor: pointer; }
+.bill-upload input { width: 100%; font-size: .82rem; }
+.bill-upload.has-file { border-color: var(--color-success); background: #f4fcf7; }
+.file-name { color: #526879; font-size: .8rem; overflow-wrap: anywhere; }
+.e-invoice-toggle { padding: 1rem; border-radius: 14px; background: #f1faf5; }
+.e-invoice-toggle label { font-weight: 700; }
+.e-invoice-toggle input { accent-color: var(--color-secondary); margin-right: .45rem; }
+.e-invoice-toggle p { margin: .45rem 0 0; color: #526879; font-size: .9rem; }
+.form-status { min-height: 1.4rem; color: #526879; font-weight: 600; }
+.form-status.success { color: var(--color-secondary); }
+.form-status.error { color: #a33b3b; }
+.invoice-help { background: linear-gradient(160deg, #071A2B, #0F5132); color: #fff; }
+.invoice-help h2 { margin-top: 1.2rem; }
+.invoice-help p, .invoice-help li { line-height: 1.65; }
+.invoice-help ul { padding-left: 1.15rem; }
+.invoice-help .privacy-note { color: rgba(255,255,255,.72); }
+.analysis-results { margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(25,195,177,.28); border-radius: 20px; background: #fff; box-shadow: 0 14px 32px rgba(17,24,39,.06); }
+.analysis-results .section-head { margin-bottom: 1rem; }
+.carbon-summary, .target-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.carbon-summary > div, .target-grid > div { display: grid; gap: .25rem; padding: 1rem; border-radius: 14px; background: #f1faf5; }
+.carbon-summary strong { font-size: 1.75rem; color: var(--color-secondary); }
+.carbon-summary span, .target-grid span, .target-grid small { color: #526879; }
+.comparison { line-height: 1.6; }
+.target-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 1rem 0; }
+.target-grid strong { font-size: 1.35rem; color: var(--color-primary); }
+.recommendation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.recommendation-grid ul { padding-left: 1.2rem; line-height: 1.65; }
+
 @media (max-width: 900px) { .mission-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) {
+    .invoice-layout, .recommendation-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+    .invoice-fields, .e-invoice-fields, .bill-upload-grid, .target-grid, .carbon-summary { grid-template-columns: 1fr; }
+}
 
 .success-banner {
     position: fixed;

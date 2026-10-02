@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from core.views import admin_cop31_guide, custom_404
+from core.views import admin_ai_providers, admin_cop31_guide, custom_404
 
 urlpatterns = [
     path('', include('core.urls')),
@@ -11,6 +11,7 @@ urlpatterns = [
     path('oyunlar/', include('games.urls')),
     path('profil/', include('accounts.urls')),
     path('admin/cop31-briefing-7f3c/', admin_cop31_guide, name='admin_cop31_guide'),
+    path('admin/ai-providers/', admin_ai_providers, name='admin_ai_providers'),
     path('admin/', admin.site.urls),
 ]
 

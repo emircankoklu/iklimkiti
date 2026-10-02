@@ -15,6 +15,15 @@
     <div class="module" style="margin-bottom: 20px;">
         <table>
             <tr>
+                <th><a href="{% url 'admin_ai_providers' %}">AI sağlayıcıları ve API anahtarları</a></th>
+                <td>Gemini veya NVIDIA fatura görseli analiz sağlayıcısını, modelini ve anahtar durumunu yönetin.</td>
+                <td><a href="{% url 'admin_ai_providers' %}" class="button">Ayarları görüntüle</a></td>
+            </tr>
+        </table>
+    </div>
+    <div class="module" style="margin-bottom: 20px;">
+        <table>
+            <tr>
                 <th><a href="{% url 'admin:core_chatpromptlog_changelist' %}">Asistan prompt kayıtları</a></th>
                 <td>Asistan kullanıcı mesajlarını görüntüleyin veya tüm kayıtları temizleyin.</td>
                 <td>

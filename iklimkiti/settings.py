@@ -94,3 +94,8 @@ NVIDIA_API_KEY = os.getenv('NVIDIA_API_KEY', '')
 NVIDIA_BASE_URL = os.getenv('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1')
 NVIDIA_MODEL = os.getenv('NVIDIA_MODEL', 'nvidia/llama-3.1-nemotron-safety-guard-8b-v3')
 NVIDIA_MAX_OUTPUT_TOKENS = int(os.getenv('NVIDIA_MAX_OUTPUT_TOKENS', '500'))
+
+# Invoice image analysis provider. Keys stay in environment variables and are never saved in the database.
+INVOICE_AI_PROVIDER = os.getenv('INVOICE_AI_PROVIDER', 'gemini').lower()
+NVIDIA_INVOICE_MODEL = os.getenv('NVIDIA_INVOICE_MODEL', 'meta/llama-3.2-90b-vision-instruct')
+NVIDIA_INVOICE_MAX_OUTPUT_TOKENS = int(os.getenv('NVIDIA_INVOICE_MAX_OUTPUT_TOKENS', '300'))

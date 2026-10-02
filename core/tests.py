@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -7,6 +8,26 @@ from core.models import ChatPromptLog, GuideSection, IdeathonGuide
 
 
 class CoreViewTests(TestCase):
+    def test_invoice_analysis_requires_login(self):
+        self.assertEqual(self.client.get('/fatura-analizi/').status_code, 302)
+
+    def test_invoice_analysis_rejects_non_image_files(self):
+        user = get_user_model().objects.create_user(username='invoiceuser', password='StrongPass!123')
+        self.client.force_login(user)
+        files = {
+            'electricity_bill': SimpleUploadedFile('electricity.txt', b'not an image', content_type='text/plain'),
+            'gas_bill': SimpleUploadedFile('gas.txt', b'not an image', content_type='text/plain'),
+            'water_bill': SimpleUploadedFile('water.txt', b'not an image', content_type='text/plain'),
+        }
+        response = self.client.post('/api/fatura-analizi/', {
+            'floor_position': 'middle',
+            'household_size': '2',
+            'showers_per_week': '4',
+            **files,
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('JPG, PNG veya WEBP', response.json()['error'])
+
     def test_homepage_loads(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
@@ -166,3 +187,15 @@ class CoreViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Kanıt avı')
         self.assertContains(self.client.get('/admin/'), 'cop31-briefing-7f3c')
+
+    def test_ai_provider_admin_page_is_staff_only_and_masks_keys(self):
+        self.assertEqual(self.client.get('/admin/ai-providers/').status_code, 302)
+        staff = get_user_model().objects.create_user(
+            username='aistaff', password='StrongPass!123', is_staff=True
+        )
+        self.client.force_login(staff)
+        response = self.client.get('/admin/ai-providers/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'GEMINI_API_KEY')
+        self.assertContains(response, 'NVIDIA_API_KEY')
+        self.assertContains(response, 'veritabanına kaydedilmez')

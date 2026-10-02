@@ -26,6 +26,7 @@
             <div class="nav-links" id="site-navigation">
                 <a href="{% url 'home' %}">Ana Sayfa</a>
                 <a href="{% url 'digital_missions' %}">Dijital Görevler</a>
+                {% if user.is_authenticated %}<a href="{% url 'invoice_analysis' %}">Fatura Analizi</a>{% endif %}
                 <a href="{% url 'topic_list' %}">Konular</a>
                 <a href="{% url 'video_list' %}">Videolar</a>
                 <a href="{% url 'game_list' %}">Oyunlar</a>
