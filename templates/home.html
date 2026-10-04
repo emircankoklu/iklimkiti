@@ -7,7 +7,10 @@
 <section class="hero">
     <div class="container hero-grid">
         <div class="hero-copy">
-            <span class="tag">{{ homepage.hero_tag }}</span>
+            <div class="hero-badges">
+                <span class="tag">{{ homepage.hero_tag }}</span>
+                <span class="status-pill">Güncelli · Canlı öğrenme</span>
+            </div>
             <h1>{{ homepage.hero_title }}</h1>
             <p>{{ homepage.hero_description }}</p>
             <div class="hero-actions">
@@ -17,12 +20,28 @@
                 <a class="secondary-btn" href="{% url 'assistant' %}">İklim Tabağım Asistanına Sor</a>
                 {% endif %}
             </div>
+            <div class="hero-metrics" aria-label="İklim Tabağım istatistikleri">
+                <div class="metric-item">
+                    <strong>3x</strong>
+                    <span>Daha hızlı öğrenme</span>
+                </div>
+                <div class="metric-item">
+                    <strong>24/7</strong>
+                    <span>Her yerde erişim</span>
+                </div>
+                <div class="metric-item">
+                    <strong>100%</strong>
+                    <span>Mobil uyumlu</span>
+                </div>
+            </div>
         </div>
         <div class="hero-visual">
-            <video class="hero-video" controls autoplay muted playsinline preload="metadata" aria-label="İklim Tabağım tanıtım videosu">
-                <source src="{% static 'videos/iklimkiti-tanitim.mp4' %}" type="video/mp4">
-                Tarayıcınız video oynatmayı desteklemiyor. <a href="{% static 'videos/iklimkiti-tanitim.mp4' %}">Videoyu aç</a>.
-            </video>
+            <div class="visual-frame">
+                <video class="hero-video" controls autoplay muted playsinline preload="metadata" aria-label="İklim Tabağım tanıtım videosu">
+                    <source src="{% static 'videos/iklimkiti-tanitim.mp4' %}" type="video/mp4">
+                    Tarayıcınız video oynatmayı desteklemiyor. <a href="{% static 'videos/iklimkiti-tanitim.mp4' %}">Videoyu aç</a>.
+                </video>
+            </div>
         </div>
     </div>
 </section>

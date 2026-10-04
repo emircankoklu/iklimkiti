@@ -209,6 +209,46 @@ class CoreViewTests(TestCase):
         self.assertEqual(request['model'], 'stealth/space-bunny-alpha')
         self.assertFalse(request['stream'])
 
+    @override_settings(OPENROUTER_API_KEY='test-key', OPENROUTER_MAX_OUTPUT_TOKENS=900)
+    @patch('core.services.chatbot.OpenAI')
+    def test_openrouter_chatbot_continues_when_response_hits_token_limit(self, openai_client):
+        openai_client.return_value.chat.completions.create.side_effect = [
+            SimpleNamespace(choices=[SimpleNamespace(
+                message=SimpleNamespace(content='İlk bölüm; yanıt yarım'),
+                finish_reason='length',
+            )]),
+            SimpleNamespace(choices=[SimpleNamespace(
+                message=SimpleNamespace(content=' kaldı, şimdi tamamlandı.'),
+                finish_reason='stop',
+            )]),
+        ]
+
+        from core.services.chatbot import OpenRouterChatbotService
+        answer = OpenRouterChatbotService().ask('Su tasarrufu nasıl sağlanır?')
+
+        self.assertEqual(answer, 'İlk bölüm; yanıt yarım kaldı, şimdi tamamlandı.')
+        self.assertEqual(openai_client.return_value.chat.completions.create.call_count, 2)
+        follow_up = openai_client.return_value.chat.completions.create.call_args.kwargs['messages']
+        self.assertEqual(follow_up[-2]['role'], 'assistant')
+        self.assertIn('devamını tamamla', follow_up[-1]['content'])
+
+    @override_settings(OPENROUTER_API_KEY='', NVIDIA_API_KEY='', GEMINI_API_KEY='', GEMINI_ENABLED=False)
+    @patch('core.services.chatbot.GeminiChatbotService.ask')
+    def test_chatbot_retries_until_provider_returns_real_response(self, ask_mock):
+        from core.services.chatbot import ChatbotService, GeminiChatbotService
+
+        fallback = GeminiChatbotService().get_safe_fallback_response()
+        ask_mock.side_effect = [
+            fallback,
+            fallback,
+            'Su tasarrufu için kısa duşlar ve damlama kontrolü faydalı olur.',
+        ]
+
+        answer = ChatbotService().ask('Su tasarrufu için ne yapabilirim?')
+
+        self.assertEqual(answer, 'Su tasarrufu için kısa duşlar ve damlama kontrolü faydalı olur.')
+        self.assertEqual(ask_mock.call_count, 3)
+
     def test_ideathon_guide_is_staff_only_at_admin_link(self):
         guide = IdeathonGuide.objects.create(introduction='Rehber')
         GuideSection.objects.create(

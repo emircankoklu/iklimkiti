@@ -8,16 +8,35 @@
 </section>
 <section class="section">
     <div class="container">
-        <div class="card">
-            {% if mind_map.image %}
-            <img src="{{ mind_map.image.url }}" alt="{{ mind_map.title }}">
-            {% else %}
-            <div class="empty-state">Görsel mevcut değil; harita kısa açıklama ile temsil edilmektedir.</div>
-            {% endif %}
-            <p>{{ mind_map.description }}</p>
-            {% if mind_map.pdf_file %}
-            <a href="{{ mind_map.pdf_file.url }}" target="_blank" rel="noreferrer">PDF indir</a>
-            {% endif %}
+        <div class="card mind-map-card">
+            <div class="mind-map-intro">
+                {% if mind_map.image %}
+                <img src="{{ mind_map.image.url }}" alt="{{ mind_map.title }}">
+                {% else %}
+                <div class="mind-map-visual empty-state">Görsel mevcut değil; harita kısa açıklama ile temsil edilmektedir.</div>
+                {% endif %}
+                <div>
+                    <span class="tag">{{ mind_map.topic.theme }}</span>
+                    <p>{{ mind_map.description }}</p>
+                    {% if mind_map.pdf_file %}
+                    <a class="primary-btn" href="{{ mind_map.pdf_file.url }}" target="_blank" rel="noreferrer">PDF indir</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mind-map-nodes">
+                {% for node in nodes %}
+                <article class="mind-map-node">
+                    <span class="mind-map-node-index">0{{ forloop.counter }}</span>
+                    <h3>{{ node.title }}</h3>
+                    {% if node.description %}
+                    <p>{{ node.description }}</p>
+                    {% endif %}
+                </article>
+                {% empty %}
+                <div class="empty-state">Bu harita için henüz konu başlığı eklenmemiş.</div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </section>

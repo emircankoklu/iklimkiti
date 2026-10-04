@@ -159,10 +159,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (form && input && body) {
+        const requestAssistantReply = async function (value, retriesLeft = 5) {
+            try {
+                const response = await fetch('/api/chatbot/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
+                    },
+                    body: new URLSearchParams({ message: value })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Hata');
+                }
+                return data.reply;
+            } catch (error) {
+                if (retriesLeft > 0) {
+                    await new Promise(resolve => window.setTimeout(resolve, 700 * (6 - retriesLeft)));
+                    return requestAssistantReply(value, retriesLeft - 1);
+                }
+                throw error;
+            }
+        };
+
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
             const value = input.value.trim();
             if (!value) return;
+
             const userMessage = document.createElement('div');
             userMessage.className = 'message user';
             userMessage.textContent = value;
@@ -170,23 +195,30 @@ document.addEventListener('DOMContentLoaded', function () {
             input.value = '';
 
             const status = document.createElement('div');
-            status.className = 'message bot';
-            status.textContent = 'Düşünüyorum...';
+            status.className = 'message bot typing-indicator';
+            status.setAttribute('role', 'status');
+            status.setAttribute('aria-label', 'Asistan yanıt yazıyor');
+            status.appendChild(document.createTextNode('Yanıt hazırlanıyor'));
+            for (let index = 0; index < 3; index += 1) {
+                const dot = document.createElement('span');
+                dot.className = 'typing-dot';
+                dot.setAttribute('aria-hidden', 'true');
+                status.appendChild(dot);
+            }
             body.appendChild(status);
+            body.scrollTop = body.scrollHeight;
 
             try {
-                const response = await fetch('/api/chatbot/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''},
-                    body: new URLSearchParams({ message: value })
-                });
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Hata');
-                }
+                const reply = await requestAssistantReply(value, 5);
+                status.classList.remove('typing-indicator');
+                status.removeAttribute('aria-label');
+                status.removeAttribute('role');
                 status.textContent = '';
-                renderBotReply(status, data.reply);
+                renderBotReply(status, reply);
             } catch (error) {
+                status.classList.remove('typing-indicator');
+                status.removeAttribute('aria-label');
+                status.removeAttribute('role');
                 status.textContent = 'İklim Tabağım Asistanı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin veya konu sayfalarındaki güvenilir kaynakları inceleyin.';
             }
 

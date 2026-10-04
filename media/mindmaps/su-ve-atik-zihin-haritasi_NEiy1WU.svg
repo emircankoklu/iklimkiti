@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+<defs><linearGradient id='bg' x1='0' x2='1'><stop offset='0%' stop-color='#f3fff9'/><stop offset='100%' stop-color='#eafaf6'/></linearGradient></defs>
+<rect width='1200' height='700' fill='url(#bg)' rx='32'/>
+<circle cx='420' cy='260' r='110' fill='#071A2B' opacity='0.96' />
+<text x='420' y='260' text-anchor='middle' dominant-baseline='middle' fill='#ffffff' font-size='32' font-family='Arial, sans-serif' font-weight='700'>Su ve At?k</text>
+<line x1='420' y1='260' x2='420.0' y2='140.0' stroke='#19C3B1' stroke-width='4' stroke-linecap='round' opacity='0.8' />
+<circle cx='420.0' cy='90.0' r='92' fill='#ffffff' stroke='#19C3B1' stroke-width='4' />
+<text x='420.0' y='80.0' text-anchor='middle' fill='#0F5132' font-size='24' font-family='Arial, sans-serif' font-weight='700'>Su ayak izi</text>
+<line x1='420' y1='260' x2='567.2243186433545' y2='200.0' stroke='#2E7DE1' stroke-width='4' stroke-linecap='round' opacity='0.8' />
+<circle cx='645.166604983954' cy='175.0' r='92' fill='#ffffff' stroke='#2E7DE1' stroke-width='4' />
+<text x='645.166604983954' y='165.0' text-anchor='middle' fill='#0F5132' font-size='24' font-family='Arial, sans-serif' font-weight='700'>Planlama</text>
+<line x1='420' y1='260' x2='567.2243186433545' y2='320.0' stroke='#37D67A' stroke-width='4' stroke-linecap='round' opacity='0.8' />
+<circle cx='645.1666049839541' cy='345.0' r='92' fill='#ffffff' stroke='#37D67A' stroke-width='4' />
+<text x='645.1666049839541' y='335.0' text-anchor='middle' fill='#0F5132' font-size='24' font-family='Arial, sans-serif' font-weight='700'>Porsiyon</text>
+<line x1='420' y1='260' x2='420.0' y2='380.0' stroke='#F4C95D' stroke-width='4' stroke-linecap='round' opacity='0.8' />
+<circle cx='420.0' cy='430.0' r='92' fill='#ffffff' stroke='#F4C95D' stroke-width='4' />
+<text x='420.0' y='420.0' text-anchor='middle' fill='#0F5132' font-size='24' font-family='Arial, sans-serif' font-weight='700'>T?ketim</text>
+<line x1='420' y1='260' x2='272.77568135664546' y2='320.00000000000006' stroke='#11998E' stroke-width='4' stroke-linecap='round' opacity='0.8' />
+<circle cx='194.83339501604598' cy='345.00000000000006' r='92' fill='#ffffff' stroke='#11998E' stroke-width='4' />
+<text x='194.83339501604598' y='335.00000000000006' text-anchor='middle' fill='#0F5132' font-size='24' font-family='Arial, sans-serif' font-weight='700'>Payla??m</text>
+<line x1='420' y1='260' x2='272.77568135664546' y2='200.0' stroke='#0F5132' stroke-width='4' stroke-linecap='round' opacity='0.8' />
+<circle cx='194.83339501604596' cy='175.0' r='92' fill='#ffffff' stroke='#0F5132' stroke-width='4' />
+<text x='194.83339501604596' y='165.0' text-anchor='middle' fill='#0F5132' font-size='24' font-family='Arial, sans-serif' font-weight='700'>D?ng?</text>
+</svg>

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import time
 import unicodedata
 from typing import Any
 
@@ -75,7 +76,7 @@ class OpenRouterChatbotService:
         self.api_key = getattr(settings, 'OPENROUTER_API_KEY', '')
         self.base_url = getattr(settings, 'OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
         self.model_name = getattr(settings, 'OPENROUTER_MODEL', 'stealth/space-bunny-alpha')
-        self.max_output_tokens = getattr(settings, 'OPENROUTER_MAX_OUTPUT_TOKENS', 500)
+        self.max_output_tokens = getattr(settings, 'OPENROUTER_MAX_OUTPUT_TOKENS', 900)
 
     def ask(self, question: str) -> str:
         try:
@@ -93,28 +94,41 @@ class OpenRouterChatbotService:
                 timeout=25.0,
                 max_retries=1,
             )
-            completion = client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {
-                        'role': 'system',
-                        'content': (
-                            'Türkçe yanıt ver. Lise öğrencisine uygun, kısa ve anlaşılır bir dil kullan. '
-                            'Yalnızca kullanıcıya yönelik nihai yanıtı ver; düşünme sürecini veya iç muhakemeni yazma. '
-                            '+18, cinsel içerik, hakaret veya küfür üretme; bu tür talepleri kısa ve nazikçe reddet. '
-                            'Gıda güvenliği, iklim, su ve sürdürülebilir yaşam sorularında güvenilir ve '
-                            'temkinli ol; bilmediğin bilgiyi uydurma. Kişisel tıbbi tavsiye verme; riskli '
-                            'gıda durumlarında resmî kaynaklara ve güvenilir bir yetişkine yönlendir. '
-                            'Zararlı, yasa dışı veya tehlikeli isteklere yardımcı olma; kısa ve sakin '
-                            'biçimde reddedip güvenli bir alternatif öner. Kullanıcıdan kişisel bilgi isteme.'
-                        ),
-                    },
-                    {'role': 'user', 'content': question},
-                ],
-                max_tokens=self.max_output_tokens,
-                stream=False,
-            )
-            answer = completion.choices[0].message.content
+            messages = [
+                {
+                    'role': 'system',
+                    'content': (
+                        'Türkçe yanıt ver. Lise öğrencisine uygun, kısa ve anlaşılır bir dil kullan. '
+                        'Yalnızca kullanıcıya yönelik nihai yanıtı ver; düşünme sürecini veya iç muhakemeni yazma. '
+                        '+18, cinsel içerik, hakaret veya küfür üretme; bu tür talepleri kısa ve nazikçe reddet. '
+                        'Gıda güvenliği, iklim, su ve sürdürülebilir yaşam sorularında güvenilir ve '
+                        'temkinli ol; bilmediğin bilgiyi uydurma. Kişisel tıbbi tavsiye verme; riskli '
+                        'gıda durumlarında resmî kaynaklara ve güvenilir bir yetişkine yönlendir. '
+                        'Zararlı, yasa dışı veya tehlikeli isteklere yardımcı olma; kısa ve sakin '
+                        'biçimde reddedip güvenli bir alternatif öner. Kullanıcıdan kişisel bilgi isteme.'
+                    ),
+                },
+                {'role': 'user', 'content': question},
+            ]
+            answer_parts = []
+            for attempt in range(3):
+                completion = client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    max_tokens=self.max_output_tokens,
+                    stream=False,
+                )
+                choice = completion.choices[0]
+                answer_part = choice.message.content
+                if answer_part:
+                    answer_parts.append(answer_part)
+                if getattr(choice, 'finish_reason', None) != 'length' or not answer_part:
+                    break
+                messages.extend([
+                    {'role': 'assistant', 'content': answer_part},
+                    {'role': 'user', 'content': 'Yanıtın devamını tamamla. Önceki metni tekrarlama; cümleyi ve yanıtı düzgün biçimde bitir.'},
+                ])
+            answer = ''.join(answer_parts)
             if not answer or not answer.strip():
                 return GeminiChatbotService().get_safe_fallback_response()
             answer = self.remove_reasoning_text(answer)
@@ -235,12 +249,29 @@ class ChatbotService:
         if not self.is_on_topic(question):
             return self.SCOPE_RESPONSE
 
+        providers = []
         if getattr(settings, 'OPENROUTER_API_KEY', ''):
-            response = OpenRouterChatbotService().ask(question)
-        elif getattr(settings, 'NVIDIA_API_KEY', ''):
-            response = NvidiaSafetyGuardChatbotService().ask(question)
-        else:
-            response = GeminiChatbotService().ask(question)
-        if not self.is_appropriate(response):
-            return self.REFUSAL_RESPONSE
-        return response
+            providers.append(OpenRouterChatbotService())
+        if getattr(settings, 'NVIDIA_API_KEY', ''):
+            providers.append(NvidiaSafetyGuardChatbotService())
+        if not providers:
+            providers.append(GeminiChatbotService())
+
+        last_response = self.REFUSAL_RESPONSE
+        for attempt in range(5):
+            for provider in providers:
+                try:
+                    response = provider.ask(question)
+                except Exception:
+                    continue
+                if response and response.strip() and not self.is_appropriate(response):
+                    return self.REFUSAL_RESPONSE
+                if response and response.strip() and response.strip() != GeminiChatbotService().get_safe_fallback_response():
+                    return response
+                last_response = response
+            if attempt < 4:
+                time.sleep(0.5 * (attempt + 1))
+
+        if last_response and last_response.strip():
+            return last_response
+        return GeminiChatbotService().get_safe_fallback_response()
